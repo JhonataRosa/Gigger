@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.instrumentaliza">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Instrumentaliza"
+        tools:targetApi="31">
+        <activity
+            android:name=".AtividadePrincipal"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AtividadeLogin"
+            android:exported="false" />
+        <activity
+            android:name=".AtividadeRegistrar"
+            android:exported="false" />
+        <activity
+            android:name=".AtividadeDetalhesInstrumento"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadePerfil"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeInstrumentos"
+            android:exported="false" />
+        <activity 
+            android:name=".AdicionarInstrumentoActivity"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeEditarPerfil"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeFavoritos"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeMeusInstrumentos"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeChat"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeListaChat"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeReserva"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeMinhasReservas"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeGerenciarDisponibilidade"
+            android:exported="false" />
+        <activity 
+            android:name=".AtividadeVisualizarDisponibilidadeInstrumento"
+            android:exported="false" />
+    </application>
+
+</manifest>

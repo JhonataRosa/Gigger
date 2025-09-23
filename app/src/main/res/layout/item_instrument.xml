@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/nav_header_beige_light"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/orange_light">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:minHeight="100dp">
+
+        <ImageView
+            android:id="@+id/instrumentImageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_music_note"
+            android:background="@color/beige_light"
+            android:contentDescription="Imagem do instrumento"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Nome do Instrumento - Agora com mais espaço -->
+        <TextView
+            android:id="@+id/nameTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textStyle="bold"
+            android:textColor="@color/text_instrument_name"
+            android:textSize="18sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:minHeight="24dp"
+            app:layout_constraintStart_toEndOf="@id/instrumentImageView"
+            app:layout_constraintEnd_toStartOf="@id/priceTextView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Categoria do Instrumento -->
+        <TextView
+            android:id="@+id/categoryTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_category_brown"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:minHeight="20dp"
+            app:layout_constraintStart_toEndOf="@id/instrumentImageView"
+            app:layout_constraintEnd_toStartOf="@id/priceTextView"
+            app:layout_constraintTop_toBottomOf="@id/nameTextView" />
+
+        <!-- Descrição do Instrumento -->
+        <TextView
+            android:id="@+id/descriptionTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_gray_light"
+            android:textSize="14sp"
+            android:minHeight="40dp"
+            app:layout_constraintStart_toEndOf="@id/instrumentImageView"
+            app:layout_constraintEnd_toStartOf="@id/priceTextView"
+            app:layout_constraintTop_toBottomOf="@id/categoryTextView" />
+
+        <!-- Preço do Instrumento - Mais compacto e posicionado acima -->
+        <TextView
+            android:id="@+id/priceTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_price"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:background="@drawable/price_background"
+            android:padding="6dp"
+            android:minWidth="70dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/favoriteButton" />
+
+        <!-- Botão de Favoritar - Agora abaixo do preço -->
+        <ImageButton
+            android:id="@+id/favoriteButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_favorite_border"
+            android:scaleType="centerInside"
+            android:contentDescription="Favoritar"
+            android:padding="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/priceTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView> 

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+        android:background="@drawable/orange_background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/text_orange">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:navigationIcon="@drawable/ic_menu"
+                app:title="@string/app_name"
+                app:titleTextAppearance="@style/AppTitleStyle" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ScrollView para fazer tudo deslizar junto -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp">
+
+            <!-- Barra de Busca -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/beige_light"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="@color/orange_primary"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/searchEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/action_search"
+                        android:textColor="@color/text_black"
+                        android:textColorHint="@color/text_gray_light"
+                        android:textSize="16sp"
+                        android:padding="8dp" />
+
+                    <!-- Botão para abrir seletor de intervalo de datas -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/dateFilterButton"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/filter_by_date"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_category_brown"
+                        app:strokeColor="@color/text_category_brown" />
+
+                    <!-- Botão para limpar filtro de datas -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/clearDateFilterButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/clear_filter"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_gray_light"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Categorias com ícones grandes -->
+            <GridLayout
+                android:id="@+id/categoryGrid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:alignmentMode="alignMargins"
+                android:columnCount="3"
+                android:rowCount="2"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/searchCard">
+
+                <!-- Categoria Todos -->
+                <LinearLayout
+                    android:id="@+id/catTodos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_music"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Todos"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Categoria Cordas -->
+                <LinearLayout
+                    android:id="@+id/catCordas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_cordas"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_strings"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Categoria Teclas -->
+                <LinearLayout
+                    android:id="@+id/catTeclas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_teclas"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_teclas"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Categoria Percussão -->
+                <LinearLayout
+                    android:id="@+id/catPercussao"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_percussao"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_percussao"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Categoria Sopros -->
+                <LinearLayout
+                    android:id="@+id/catSopros"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_sopro"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_sopro"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Categoria Acessórios -->
+                <LinearLayout
+                    android:id="@+id/catAcessorios"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/category_card_background"
+                    android:layout_margin="8dp"
+                    android:padding="12dp"
+                    android:elevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clipToOutline="true">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_acessorios"
+                        android:tint="@color/text_category_brown" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_acessorios"
+                        android:textColor="@color/text_category_brown"
+                        android:textSize="16sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+            </GridLayout>
+
+            <!-- Botões de Ordenação -->
+            <LinearLayout
+                android:id="@+id/sortButtonGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/categoryGrid">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sortPriceAscButton"
+                    style="@style/SortButtonSelected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="MENOR PREÇO"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sortPriceDescButton"
+                    style="@style/SortButtonUnselected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MAIOR PREÇO"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Título da Seção -->
+            <TextView
+                android:id="@+id/instrumentsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/instruments_title"
+                android:textColor="@color/text_category_brown"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sortButtonGroup" />
+
+            <!-- Lista de Instrumentos -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/instrumentsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:paddingBottom="88dp"
+                app:layout_constraintTop_toBottomOf="@id/instrumentsTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Floating Action Button - FORA do ScrollView para ficar fixo -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addInstrumentFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/orange_primary"
+        app:layout_anchor="@id/instrumentsRecyclerView"
+        app:layout_anchorGravity="bottom|end"
+        app:tint="@color/white"
+        app:elevation="8dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/nav_header_beige_light"
+        app:headerLayout="@layout/nav_header_profile"
+        app:itemTextColor="@color/text_dark_brown"
+        app:itemIconTint="@color/text_dark_brown"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout> 

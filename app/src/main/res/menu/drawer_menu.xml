@@ -1,0 +1,57 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Início -->
+    <item
+        android:id="@+id/nav_home"
+        android:title="@string/nav_home"
+        android:icon="@drawable/ic_home" />
+    
+    <!-- Instrumentos -->
+    <item
+        android:id="@+id/nav_instruments"
+        android:title="@string/nav_instruments"
+        android:icon="@drawable/ic_music" />
+    
+    <!-- Meus Aluguéis -->
+    <item
+        android:id="@+id/nav_my_rentals"
+        android:title="@string/nav_my_rentals"
+        android:icon="@drawable/ic_rentals" />
+    
+    <!-- Favoritos -->
+    <item
+        android:id="@+id/nav_favorites"
+        android:title="@string/nav_favorites"
+        android:icon="@drawable/ic_favorite" />
+    
+    <!-- Mensagens -->
+    <item
+        android:id="@+id/nav_messages"
+        android:title="@string/nav_messages"
+        android:icon="@drawable/ic_message" />
+    
+    <!-- Ajuda / FAQ -->
+    <item
+        android:id="@+id/nav_help"
+        android:title="Ajuda / FAQ"
+        android:icon="@drawable/ic_help" />
+    
+    <!-- Sobre -->
+    <item
+        android:id="@+id/nav_about"
+        android:title="Sobre"
+        android:icon="@drawable/ic_info" />
+    
+    <!-- Divider -->
+    <item
+        android:id="@+id/nav_divider"
+        android:title=""
+        android:enabled="false" />
+    
+    <!-- Sair -->
+    <item
+        android:id="@+id/nav_logout"
+        android:title="@string/nav_logout"
+        android:icon="@drawable/ic_logout" />
+        
+</menu> 

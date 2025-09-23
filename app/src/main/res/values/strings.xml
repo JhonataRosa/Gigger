@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Instrumentaliza</string>
+
+    <!-- Navegação e Menu -->
+    <string name="nav_home">Início</string>
+    <string name="nav_instruments">Instrumentos</string>
+    <string name="nav_my_rentals">Meus Aluguéis</string>
+    <string name="nav_favorites">Favoritos</string>
+    <string name="nav_messages">Mensagens</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_logout">Sair</string>
+
+    <!-- Login e Registro -->
+    <string name="login_title">Entrar</string>
+    <string name="register_title">Cadastrar</string>
+    <string name="email_hint">E-mail</string>
+    <string name="password_hint">Senha</string>
+    <string name="name_hint">Nome completo</string>
+    <string name="phone_hint">Telefone</string>
+    <string name="login_button">Entrar</string>
+    <string name="register_button">Cadastrar</string>
+    <string name="no_account">Não tem uma conta? Cadastre-se</string>
+    <string name="has_account">Já tem uma conta? Entre</string>
+
+    <!-- Perfil -->
+    <string name="profile_title">Meu Perfil</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="my_data">Meus Dados</string>
+    <string name="my_ratings">Minhas Avaliações</string>
+    <string name="save_profile">Salvar</string>
+    <string name="profile_updated">Perfil atualizado com sucesso!</string>
+    <string name="photo_updated">Foto atualizada com sucesso!</string>
+
+    <!-- Instrumentos -->
+    <string name="instruments_title">Instrumentos</string>
+    <string name="my_instruments">Meus Instrumentos</string>
+    <string name="add_instrument">Adicionar Instrumento</string>
+    <string name="edit_instrument">Editar Instrumento</string>
+    <string name="delete_instrument">Excluir Instrumento</string>
+    <string name="instrument_name">Nome do Instrumento</string>
+    <string name="instrument_description">Descrição</string>
+    <string name="instrument_price">Preço por diária (R$)</string>
+    <string name="instrument_category">Categoria</string>
+    <string name="select_category">Selecionar Categoria</string>
+    <string name="save_instrument">Salvar Instrumento</string>
+    <string name="instrument_saved">Instrumento salvo com sucesso!</string>
+    <string name="instrument_updated">Instrumento atualizado com sucesso!</string>
+    <string name="instrument_deleted">Instrumento excluído com sucesso!</string>
+    <string name="instrument_details_title">Detalhes do Instrumento</string>
+
+    <!-- Categorias -->
+    <string name="category_strings">Cordas</string>
+    <string name="category_sopro">Sopro</string>
+    <string name="category_teclas">Teclas</string>
+    <string name="category_percussao">Percussão</string>
+    <string name="category_acessorios">Acessórios</string>
+
+    <!-- Favoritos -->
+    <string name="favorites_title">Favoritos</string>
+    <string name="my_favorites">Meus Favoritos</string>
+    <string name="no_favorites">Nenhum instrumento favoritado</string>
+    <string name="add_to_favorites">Adicionar aos Favoritos</string>
+    <string name="remove_from_favorites">Remover dos Favoritos</string>
+
+    <!-- Mensagens -->
+    <string name="messages_title">Mensagens</string>
+    <string name="chat_title">Chat</string>
+    <string name="my_conversations">Minhas Conversas</string>
+    <string name="no_conversations">Nenhuma conversa encontrada</string>
+    <string name="send_message">Enviar Mensagem</string>
+    <string name="type_message">Digite sua mensagem...</string>
+    <string name="message_sent">Mensagem enviada!</string>
+    <string name="message_failed">Falha ao enviar mensagem</string>
+
+    <!-- Reservas -->
+    <string name="reservations_title">Minhas Reservas</string>
+    <string name="reservation_details">Detalhes da Reserva</string>
+    <string name="reservation_date">Data da Reserva</string>
+    <string name="reservation_duration">Duração</string>
+    <string name="reservation_total">Total</string>
+    <string name="make_reservation">Fazer Reserva</string>
+    <string name="reservation_success">Reserva realizada com sucesso!</string>
+    <string name="reservation_failed">Falha ao realizar reserva</string>
+
+    <!-- Disponibilidade -->
+    <string name="availability_title">Disponibilidade</string>
+    <string name="manage_availability">Gerenciar Disponibilidade</string>
+    <string name="view_availability">Ver Disponibilidade</string>
+    <string name="clear_all_dates">Limpar todas as datas</string>
+    <string name="calendar_title">Calendário de Disponibilidade</string>
+    <string name="unavailable_dates">Datas Indisponíveis</string>
+    <string name="no_unavailable_dates">Nenhuma data indisponível</string>
+    <string name="add_unavailable_date">Adicionar Data Indisponível</string>
+    <string name="remove_unavailable_date">Remover Data</string>
+    <string name="date_range_added">Período adicionado com sucesso!</string>
+    <string name="date_range_removed">Período removido com sucesso!</string>
+    <string name="select_date_range">Selecionar Período</string>
+    <string name="from_date">Data Inicial</string>
+    <string name="to_date">Data Final</string>
+    <string name="save_date_range">Salvar Período</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Filtros -->
+    <string name="filter_by_date">Filtrar por Data</string>
+    <string name="dates">Datas</string>
+    <string name="clear_filter">Limpar Filtro</string>
+    <string name="select_start_date">Selecionar Data Inicial</string>
+    <string name="select_end_date">Selecionar Data Final</string>
+    <string name="apply_filter">Aplicar Filtro</string>
+
+    <!-- Mensagens de Erro -->
+    <string name="error_generic">Ocorreu um erro. Tente novamente.</string>
+    <string name="error_network">Erro de conexão. Verifique sua internet.</string>
+    <string name="error_auth">Erro de autenticação. Faça login novamente.</string>
+    <string name="error_permission">Permissão negada.</string>
+    <string name="error_required_field">Campo obrigatório</string>
+    <string name="error_invalid_email">E-mail inválido</string>
+    <string name="error_weak_password">Senha muito fraca</string>
+    <string name="error_user_not_found">Usuário não encontrado</string>
+    <string name="error_instrument_not_found">Instrumento não encontrado</string>
+    <string name="error_id_not_provided">ID não fornecido</string>
+
+    <!-- Mensagens de Sucesso -->
+    <string name="success_login">Login realizado com sucesso!</string>
+    <string name="success_register">Cadastro realizado com sucesso!</string>
+    <string name="success_logout">Logout realizado com sucesso!</string>
+    <string name="success_save">Salvo com sucesso!</string>
+    <string name="success_delete">Excluído com sucesso!</string>
+    <string name="success_update">Atualizado com sucesso!</string>
+    <string name="passwords_do_not_match">As senhas não coincidem</string>
+    <string name="email_already_registered">Este email já está cadastrado</string>
+    <string name="user_default_name">Usuário</string>
+
+    <!-- Confirmações -->
+    <string name="confirm_delete">Tem certeza que deseja excluir?</string>
+    <string name="confirm_logout">Tem certeza que deseja sair?</string>
+    <string name="confirm_cancel_reservation">Tem certeza que deseja cancelar esta reserva?</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+    <string name="ok">OK</string>
+    <string name="not_logged_in">Usuário não logado</string>
+    <string name="removed_from_favorites">Removido dos favoritos</string>
+    <string name="added_to_favorites">Adicionado aos favoritos!</string>
+    <string name="error_remove_favorite">Erro ao remover dos favoritos</string>
+    <string name="error_add_favorite">Erro ao adicionar aos favoritos</string>
+    <string name="login_required">Você precisa estar logado</string>
+
+    <!-- Estados Vazios -->
+    <string name="empty_instruments">Nenhum instrumento encontrado</string>
+    <string name="empty_reservations">Nenhuma reserva encontrada</string>
+    <string name="empty_messages">Nenhuma mensagem encontrada</string>
+    <string name="empty_favorites">Nenhum favorito encontrado</string>
+
+    <!-- Ações -->
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_next">Próximo</string>
+    <string name="action_previous">Anterior</string>
+    <string name="action_refresh">Atualizar</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_filter">Filtrar</string>
+    <string name="action_sort">Ordenar</string>
+
+    <!-- Preços e Valores -->
+    <string name="price_label">Preço:</string>
+    <string name="price_per_day">Preço por dia:</string>
+    <string name="info_no_data">Não disponível</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pendente</string>
+    <string name="status_confirmed">Confirmada</string>
+    <string name="status_cancelled">Cancelada</string>
+    <string name="status_completed">Concluída</string>
+    <string name="feature_in_development">Funcionalidade em desenvolvimento</string>
+    <string name="feature_not_allowed">Não é possível realizar esta ação</string>
+    <string name="validation_required">Preencha todos os campos obrigatórios</string>
+
+    <!-- Informações -->
+    <string name="validation_password_min">A senha deve ter pelo menos 6 caracteres</string>
+    <string name="validation_price_positive">O preço deve ser um valor positivo</string>
+    <string name="instrument_not_found">Instrumento não encontrado</string>
+    <string name="error_loading_instrument">Erro ao carregar instrumento</string>
+    <string name="invalid_price">Preço inválido</string>
+    <string name="fill_all_fields">Preencha todos os campos</string>
+    <string name="reservation_already_exists">Já existe uma reserva para este período</string>
+    <string name="select_start_date_first">Selecione primeiro a data de início</string>
+    <string name="end_date_after_start_date">A data final deve ser posterior à data inicial</string>
+    <string name="select_dates_range">Selecione o período desejado</string>
+    <string name="error_loading_messages">Erro ao carregar mensagens</string>
+    <string name="error_creating_chat">Erro ao criar conversa</string>
+    <string name="error_sending_message">Erro ao enviar mensagem</string>
+    <string name="error_initializing">Erro ao inicializar</string>
+    <string name="error_delete">Erro ao excluir</string>
+
+    <!-- Validações -->
+    <string name="date_picker_title_period">Selecione o período</string>
+    <string name="date_picker_title_unavailable">Selecione período indisponível</string>
+    <string name="action_save_caps">SALVAR</string>
+    <string name="action_cancel_caps">CANCELAR</string>
+    <string name="confirm_delete_instrument_message">Tem certeza que deseja excluir este instrumento?</string>
+    <string name="confirm_clear_unavailable_message">Tem certeza que deseja remover todas as datas indisponíveis?</string>
+    <string name="picker_tag_unavailable_range">period_unavailable_range</string>
+    <string name="marked_by_owner">Marcado pelo proprietário</string>
+    <string name="label_data_inicial">Data inicial: </string>
+    <string name="label_data_final">Data final: </string>
+    <string name="add_photo">Adicionar Foto</string>
+    <string name="instrument_name_label">Nome do Instrumento</string>
+    <string name="add_period">Adicionar período</string>
+    <string name="clear_all">Limpar tudo</string>
+    <string name="unavailable_periods">Períodos indisponíveis</string>
+    <string name="calendar_icon_desc">Ícone de calendário</string>
+    <string name="no_unavailable_periods_message">Nenhum período indisponível encontrado</string>
+    <string name="tip_add_period">Toque no botão + para adicionar um período indisponível</string>
+    <string name="main_tagline">Alugue ou disponibilize instrumentos musicais de forma fácil e segura</string>
+    <string name="no_reservations">Nenhuma reserva ainda</string>
+    <string name="new_reservation">Nova reserva</string>
+    <string name="start_date_hint">Data de início</string>
+    <string name="end_date_hint">Data de fim</string>
+    <string name="confirm_reservation">Confirmar Reserva</string>
+    <string name="availability_calendar">Calendário de Disponibilidade</string>
+    <string name="current_month_example">Janeiro 2024</string>
+    <string name="instrument_available_message">Este instrumento está disponível no período selecionado</string>
+    <string name="instrument_available_tip">Você pode prosseguir com a reserva</string>
+    <string name="unavailable_badge">Indisponível</string>
+    <string name="loading">Carregando...</string>
+    <string name="type_message_hint">Digite sua mensagem...</string>
+    <string name="send">Enviar</string>
+    <string name="start_conversation_tip">Inicie uma conversa enviando uma mensagem</string>
+    <string name="change_photo">Alterar foto</string>
+    <string name="name_label">Nome</string>
+    <string name="email_label">E-mail</string>
+    <string name="owner_info">Informações do Proprietário</string>
+    <string name="category_label">Categoria</string>
+    <string name="description_label">Descrição</string>
+    <string name="instrument_description_placeholder">Descreva seu instrumento...</string>
+    <string name="owner_name_label">Nome do proprietário</string>
+    <string name="owner_name_placeholder">Nome não informado</string>
+    <string name="owner_email_label">E-mail do proprietário</string>
+    <string name="owner_phone_label">Telefone do proprietário</string>
+    <string name="owner_phone_placeholder">Telefone não informado</string>
+    <string name="manage_availability_button">Gerenciar Disponibilidade</string>
+    <string name="view_availability_button">Ver Disponibilidade</string>
+    <string name="send_message_button">Enviar Mensagem</string>
+    <string name="profile_data_title">Dados do Perfil</string>
+    <string name="ratings_title">Avaliações</string>
+    <string name="all">Todos</string>
+    <string name="sort_price_asc">MENOR PREÇO</string>
+    <string name="sort_price_desc">MAIOR PREÇO</string>
+    <string name="view_profile">Ver perfil</string>
+    <string name="menu_my_reservations">Minhas Reservas</string>
+    <string name="menu_logout">Sair</string>
+    <string name="home_view_instruments">Ver Instrumentos</string>
+    <string name="home_view_profile">Ver Perfil</string>
+</resources>

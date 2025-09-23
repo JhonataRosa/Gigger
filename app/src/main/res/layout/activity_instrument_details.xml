@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/orange_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/orange_primary"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Detalhes do Instrumento"
+            app:titleTextColor="@color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/orange_background"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Card da Imagem do Instrumento -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/nav_header_beige_light">
+
+                <ImageView
+                    android:id="@+id/instrumentImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_music_note"
+                    android:background="@color/beige_light"
+                    android:contentDescription="Imagem do instrumento" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card das Informações do Instrumento -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/nav_header_beige_light">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Nome do Instrumento -->
+                    <TextView
+                        android:id="@+id/nameTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nome do Instrumento"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_instrument_name"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Categoria do Instrumento -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_music_note"
+                            android:tint="@color/text_category_brown"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/categoryTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Categoria"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_category_brown" />
+
+                    </LinearLayout>
+
+                    <!-- Preço do Instrumento -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Preço por dia:"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_gray_light"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:id="@+id/priceTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$ 0,00"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:background="@drawable/price_background"
+                            android:padding="8dp"
+                            android:minWidth="80dp"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                    <!-- Descrição do Instrumento -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Descrição:"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_instrument_name"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/descriptionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Descrição do instrumento..."
+                        android:textSize="16sp"
+                        android:textColor="@color/text_gray_light"
+                        android:lineSpacingExtra="4dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card das Informações do Proprietário -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/nav_header_beige_light">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Título da Seção -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_profile"
+                            android:tint="@color/orange_primary"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Informações do Proprietário"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_orange_dark" />
+
+                    </LinearLayout>
+
+                    <!-- Nome do Proprietário -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nome:"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_category_brown"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:id="@+id/ownerNameTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Nome do proprietário"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_instrument_name" />
+
+                    </LinearLayout>
+
+                    <!-- Email do Proprietário -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email:"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_category_brown"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:id="@+id/ownerEmailTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="email@exemplo.com"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_instrument_name" />
+
+                    </LinearLayout>
+
+                    <!-- Telefone do Proprietário -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Telefone:"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_category_brown"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:id="@+id/ownerPhoneTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="(00) 00000-0000"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_instrument_name" />
+
+                    </LinearLayout>
+
+                    <!-- Botão para o proprietário gerenciar disponibilidade -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/manageAvailabilityButton"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:padding="16dp"
+                        android:text="Gerenciar Disponibilidade"
+                        android:textAllCaps="false"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        app:strokeColor="@color/orange_primary"
+                        android:textColor="@color/orange_primary"
+                        app:icon="@drawable/ic_calendar"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/orange_primary" />
+
+                    <!-- Botão de Reservar/Ver Disponibilidade -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/reserveButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:padding="16dp"
+                        android:text="Ver Disponibilidade"
+                        android:textAllCaps="false"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        android:backgroundTint="@color/orange_primary"
+                        android:textColor="@color/white"
+                        app:icon="@drawable/ic_calendar"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/white" />
+
+                    <!-- Botão de Enviar Mensagem -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sendMessageButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:padding="16dp"
+                        android:text="Enviar Mensagem"
+                        android:textAllCaps="false"
+                        android:textSize="16sp"
+                        android:visibility="gone"
+                        android:backgroundTint="@color/orange_primary"
+                        android:textColor="@color/white"
+                        app:icon="@drawable/ic_message"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/white" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 

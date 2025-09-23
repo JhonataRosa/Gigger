@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Instrumentaliza" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Instrumentaliza" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/text_orange</item>
+        <item name="colorPrimaryVariant">@color/text_orange</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/text_orange</item>
+        <item name="colorSecondaryVariant">@color/text_orange_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/text_orange</item>
+        <!-- Text appearance -->
+        <item name="textAppearanceHeadline5">@style/TextAppearance.MaterialComponents.Headline5</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.MaterialComponents.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
+    </style>
+
+    <style name="Theme.Instrumentaliza.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Estilo personalizado para o título -->
+    <style name="AppTitleStyle" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+
+    <!-- Estilo para botão selecionado -->
+    <style name="SortButtonSelected" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/button_selected_text</item>
+        <item name="backgroundTint">@color/button_selected_bg</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+
+    <!-- Estilo para botão não selecionado -->
+    <style name="SortButtonUnselected" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/button_unselected_text</item>
+        <item name="backgroundTint">@color/button_unselected_bg</item>
+        <item name="strokeColor">@color/button_unselected_text</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+</resources>

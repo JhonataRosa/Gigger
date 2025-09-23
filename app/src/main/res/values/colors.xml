@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores base do Material Design -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#757575</color>
+    <color name="light_gray">#EEEEEE</color>
+
+    <!-- Cores do tema do app -->
+    <color name="primary_color">#FF6200EE</color>
+    <color name="primary_dark_color">#FF3700B3</color>
+    <color name="accent_color">#FF03DAC5</color>
+    
+    <!-- Cores dos componentes -->
+    <color name="chip_background">#B388FC</color>
+    <color name="button_background">#26FFFFFF</color>
+    <color name="card_background">@color/white</color>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="primary">#6200EE</color>
+    <color name="primary_light">#BB86FC</color>
+
+    <!-- Cores do novo design da homepage -->
+    <color name="orange_primary">#FF8B4A</color>
+    <color name="orange_dark">#E6733A</color>
+    <color name="orange_light">#FFB380</color>
+    <color name="beige_light">#F5E6D3</color>
+    <color name="beige_card">#FFF5E6</color>
+    
+    <!-- Cores dos textos baseadas na imagem -->
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_black">#000000</color>
+    <color name="text_gray_light">#9E9E9E</color>
+    <color name="text_orange">#FF8B4A</color>
+    <color name="text_orange_dark">#E6733A</color>
+    <color name="text_instrument_name">#000000</color>
+    <color name="text_price">#FFFFFF</color>
+    <color name="text_category_brown">#8B4513</color>
+    
+    <!-- Cores da app bar -->
+    <color name="app_bar_purple">#6200EE</color>
+    <color name="orange_selected">#E6733A</color>
+    
+    <!-- Cores dos botões de ordenação -->
+    <color name="button_selected_bg">#FF6B4A</color>
+    <color name="button_unselected_bg">#FFFFFF</color>
+    <color name="button_unselected_text">#FF8B4A</color>
+    <color name="button_selected_text">#FFFFFF</color>
+    
+    <!-- Cores da nova barra lateral -->
+    <color name="text_dark_brown">#5C3D2E</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="nav_header_beige_light">#F8F5ED</color>
+    <color name="nav_header_beige_dark">#F0EDE5</color>
+</resources>

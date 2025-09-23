@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:contentScrim="@color/primary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/profileBackgroundImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@color/primary_light"
+                app:layout_collapseMode="parallax" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/ic_profile"
+                app:layout_collapseMode="parallax" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="@drawable/orange_background">
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_title"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_orange_dark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/nameLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nome:"
+                android:textStyle="bold"
+                android:textColor="@color/text_orange_dark"
+                android:layout_marginTop="32dp"
+                app:layout_constraintTop_toBottomOf="@id/titleTextView"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/text_instrument_name"
+                app:layout_constraintTop_toTopOf="@id/nameLabelTextView"
+                app:layout_constraintStart_toEndOf="@id/nameLabelTextView"/>
+
+            <TextView
+                android:id="@+id/emailLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email:"
+                android:textStyle="bold"
+                android:textColor="@color/text_orange_dark"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/nameLabelTextView"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/emailTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/text_instrument_name"
+                app:layout_constraintTop_toTopOf="@id/emailLabelTextView"
+                app:layout_constraintStart_toEndOf="@id/emailLabelTextView"/>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/profileTabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/emailTextView"
+                app:tabGravity="fill"
+                app:tabMode="fixed">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/my_data" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/my_ratings" />
+
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/profileViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/profileTabLayout" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/editProfileFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/edit_profile"
+        app:srcCompat="@drawable/ic_edit" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 
