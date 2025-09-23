@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "589634244381",
+    "project_id": "instrumentaliza-da23c",
+    "storage_bucket": "instrumentaliza-da23c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589634244381:android:59d303728d975bc84a5bf4",
+        "android_client_info": {
+          "package_name": "com.example.instrumentaliza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmDO-iXIBkvvTgWDrpMjCr-agiSGDlhzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

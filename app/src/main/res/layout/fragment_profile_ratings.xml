@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <!-- Ícone de avaliação -->
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_star"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Ícone de avaliação" />
+
+    <!-- Título -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Minhas Avaliações"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_orange_dark"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Mensagem -->
+    <TextView
+        android:id="@+id/messageTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Funcionalidade de avaliações será implementada em breve!\n\nAqui você poderá ver todas as avaliações que outros usuários fizeram sobre você como anunciante."
+        android:textSize="16sp"
+        android:textColor="@color/text_gray_light"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:padding="24dp"
+        android:background="@color/beige_light"
+        android:layout_marginTop="16dp" />
+
+    <!-- Informações adicionais -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⭐ Avaliações baseadas em transações\n⭐ Sistema de estrelas (1-5)\n⭐ Comentários dos usuários\n⭐ Histórico de feedback"
+        android:textSize="14sp"
+        android:textColor="@color/text_category_brown"
+        android:gravity="center"
+        android:layout_marginTop="32dp"
+        android:lineSpacingExtra="4dp" />
+
+</LinearLayout>
