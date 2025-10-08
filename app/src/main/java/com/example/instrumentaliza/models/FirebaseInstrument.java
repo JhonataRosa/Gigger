@@ -46,6 +46,10 @@ public class FirebaseInstrument {
     private Date createdAt;
     private boolean available;
     private List<Map<String, Object>> unavailableRanges;
+    
+    // Sistema de avaliações
+    private double notaMedia;
+    private long totalAvaliacoes;
 
     /**
      * Construtor vazio necessário para o Firestore
@@ -124,6 +128,21 @@ public class FirebaseInstrument {
             instrument.setUnavailableRanges(ranges);
         } else {
             instrument.setUnavailableRanges(new ArrayList<>());
+        }
+        
+        // Carregar dados de avaliações
+        Object notaMediaObj = document.get("notaMedia");
+        if (notaMediaObj instanceof Number) {
+            instrument.setNotaMedia(((Number) notaMediaObj).doubleValue());
+        } else {
+            instrument.setNotaMedia(0.0);
+        }
+        
+        Object totalAvaliacoesObj = document.get("totalAvaliacoes");
+        if (totalAvaliacoesObj instanceof Number) {
+            instrument.setTotalAvaliacoes(((Number) totalAvaliacoesObj).longValue());
+        } else {
+            instrument.setTotalAvaliacoes(0);
         }
         
         return instrument;
@@ -289,5 +308,71 @@ public class FirebaseInstrument {
      */
     public void setUnavailableRanges(List<Map<String, Object>> unavailableRanges) {
         this.unavailableRanges = unavailableRanges;
+    }
+    
+    /**
+     * Obtém a nota média do instrumento
+     * @return Nota média de 0.0 a 5.0
+     */
+    public double getNotaMedia() {
+        return notaMedia;
+    }
+    
+    /**
+     * Define a nota média do instrumento
+     * @param notaMedia Nota média de 0.0 a 5.0
+     */
+    public void setNotaMedia(double notaMedia) {
+        this.notaMedia = Math.max(0.0, Math.min(5.0, notaMedia));
+    }
+    
+    /**
+     * Obtém o total de avaliações recebidas
+     * @return Número total de avaliações
+     */
+    public long getTotalAvaliacoes() {
+        return totalAvaliacoes;
+    }
+    
+    /**
+     * Define o total de avaliações recebidas
+     * @param totalAvaliacoes Número total de avaliações
+     */
+    public void setTotalAvaliacoes(long totalAvaliacoes) {
+        this.totalAvaliacoes = Math.max(0, totalAvaliacoes);
+    }
+    
+    /**
+     * Retorna a nota média formatada como string
+     * @return String com nota formatada (ex: "4.5")
+     */
+    public String getNotaMediaFormatada() {
+        return String.format("%.1f", notaMedia);
+    }
+    
+    /**
+     * Retorna as estrelas formatadas para exibição
+     * @return String com estrelas (ex: "★★★★☆")
+     */
+    public String getEstrelasFormatadas() {
+        StringBuilder estrelas = new StringBuilder();
+        for (int i = 1; i <= 5; i++) {
+            if (i <= notaMedia) {
+                estrelas.append("★");
+            } else if (i - 0.5 <= notaMedia) {
+                estrelas.append("★"); // Meia estrela
+            } else {
+                estrelas.append("☆");
+            }
+        }
+        return estrelas.toString();
+    }
+    
+    /**
+     * Verifica se o instrumento possui avaliações
+     * @return true se possui avaliações, false caso contrário
+     */
+    public boolean possuiAvaliacoes() {
+        return totalAvaliacoes > 0;
     }
 } 

@@ -1,6 +1,7 @@
 package com.example.instrumentaliza.models;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.Timestamp;
 
 import java.util.Date;
 
@@ -34,11 +35,29 @@ public class FirebaseReservation {
         reservation.setId(document.getId());
         reservation.setUserId((String) document.get("userId"));
         reservation.setInstrumentId((String) document.get("instrumentId"));
-        reservation.setStartDate((Date) document.get("startDate"));
-        reservation.setEndDate((Date) document.get("endDate"));
-        reservation.setTotalPrice(((Number) document.get("totalPrice")).doubleValue());
+        
+        // Converter Timestamp para Date
+        Timestamp startTimestamp = document.getTimestamp("startDate");
+        if (startTimestamp != null) {
+            reservation.setStartDate(startTimestamp.toDate());
+        }
+        
+        Timestamp endTimestamp = document.getTimestamp("endDate");
+        if (endTimestamp != null) {
+            reservation.setEndDate(endTimestamp.toDate());
+        }
+        
+        Timestamp createdAtTimestamp = document.getTimestamp("createdAt");
+        if (createdAtTimestamp != null) {
+            reservation.setCreatedAt(createdAtTimestamp.toDate());
+        }
+        
+        Number totalPrice = (Number) document.get("totalPrice");
+        if (totalPrice != null) {
+            reservation.setTotalPrice(totalPrice.doubleValue());
+        }
+        
         reservation.setStatus((String) document.get("status"));
-        reservation.setCreatedAt((Date) document.get("createdAt"));
         return reservation;
     }
 

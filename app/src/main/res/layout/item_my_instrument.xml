@@ -96,6 +96,42 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Botões de Ação -->
+        <LinearLayout
+            android:id="@+id/actionButtonsLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal"
+            android:gravity="start"
+            app:layout_constraintStart_toEndOf="@id/instrumentImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionTextView">
+
+            <!-- Botão Solicitações -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/requestsButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:text="Solicitações"
+                android:textSize="12sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:strokeColor="@color/orange_primary"
+                app:strokeWidth="1dp"
+                android:textColor="@color/orange_primary"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_add"
+                app:iconSize="16dp"
+                app:iconTint="@color/orange_primary"
+                app:iconGravity="textStart"
+                android:contentDescription="Ver Solicitações" />
+
+        </LinearLayout>
+
         <!-- Botão de Editar -->
         <ImageButton
             android:id="@+id/editButton"
@@ -109,7 +145,7 @@
             android:padding="4dp"
             android:tint="@color/orange_primary"
             app:layout_constraintEnd_toStartOf="@id/deleteButton"
-            app:layout_constraintTop_toBottomOf="@id/priceTextView" />
+            app:layout_constraintTop_toBottomOf="@id/actionButtonsLayout" />
 
         <!-- Botão de Deletar -->
         <ImageButton
@@ -125,7 +161,7 @@
             android:padding="4dp"
             android:tint="@color/text_gray_light"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/priceTextView" />
+            app:layout_constraintTop_toBottomOf="@id/actionButtonsLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

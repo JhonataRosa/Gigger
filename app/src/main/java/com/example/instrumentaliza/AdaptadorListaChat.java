@@ -62,6 +62,12 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
          * @param chat DocumentSnapshot da conversa clicada
          */
         void onChatClick(DocumentSnapshot chat);
+        
+        /**
+         * Callback chamado quando o usuário quer excluir uma conversa
+         * @param chat DocumentSnapshot da conversa a ser excluída
+         */
+        void onChatDelete(DocumentSnapshot chat);
     }
 
     /**
@@ -136,8 +142,12 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
                 : "Você - interessado";
         holder.textoPapelBadge.setText(textoPapel);
 
-        // Configurar listener para clique na conversa
+        // Configurar listeners
         holder.itemView.setOnClickListener(v -> listener.onChatClick(chatDoc));
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onChatDelete(chatDoc);
+            return true; // Consumir o evento
+        });
     }
 
     /**
@@ -161,7 +171,15 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
         firestore.collection("instruments").document(instrumentId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc != null && doc.exists()) {
+                        // Tentar diferentes campos de nome
                         String name = doc.getString("name");
+                        if (name == null || name.isEmpty()) {
+                            name = doc.getString("nome");
+                        }
+                        if (name == null || name.isEmpty()) {
+                            name = doc.getString("instrumentName");
+                        }
+                        
                         Log.d(TAG, "Nome do instrumento encontrado: " + name);
                         if (name != null && !name.isEmpty()) {
                             textView.setText(name);

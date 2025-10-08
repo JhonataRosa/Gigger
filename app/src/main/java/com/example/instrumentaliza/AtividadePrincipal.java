@@ -53,8 +53,8 @@ public class AtividadePrincipal extends AppCompatActivity {
         }
 
         Log.d("MainActivity", "Procurando botões...");
-        Button botaoLogin = findViewById(R.id.loginButton);
-        Button botaoRegistrar = findViewById(R.id.registerButton);
+        Button botaoLogin = findViewById(R.id.botaoEntrar);
+        Button botaoRegistrar = findViewById(R.id.botaoCadastrar);
 
         // Verificar se os botões foram encontrados corretamente
         if (botaoLogin == null) {

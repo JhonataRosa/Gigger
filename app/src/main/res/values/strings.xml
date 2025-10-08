@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Instrumentaliza</string>
+    <string name="logo_description">Logo do aplicativo Instrumentaliza com instrumentos musicais</string>
 
     <!-- Navegação e Menu -->
     <string name="nav_home">Início</string>
     <string name="nav_instruments">Instrumentos</string>
-    <string name="nav_my_rentals">Meus Aluguéis</string>
+    <string name="nav_my_rentals">Aluguéis</string>
+    <string name="nav_requests">Solicitações</string>
     <string name="nav_favorites">Favoritos</string>
     <string name="nav_messages">Mensagens</string>
     <string name="nav_profile">Perfil</string>
@@ -28,6 +30,9 @@
     <string name="edit_profile">Editar Perfil</string>
     <string name="my_data">Meus Dados</string>
     <string name="my_ratings">Minhas Avaliações</string>
+    <string name="registration_data">Dados Cadastrais</string>
+    <string name="phone_label">Telefone:</string>
+    <string name="profile_info_text">Para atualizar seus dados, use o botão de edição na tela principal.</string>
     <string name="save_profile">Salvar</string>
     <string name="profile_updated">Perfil atualizado com sucesso!</string>
     <string name="photo_updated">Foto atualizada com sucesso!</string>
@@ -85,7 +90,6 @@
 
     <!-- Disponibilidade -->
     <string name="availability_title">Disponibilidade</string>
-    <string name="manage_availability">Gerenciar Disponibilidade</string>
     <string name="view_availability">Ver Disponibilidade</string>
     <string name="clear_all_dates">Limpar todas as datas</string>
     <string name="calendar_title">Calendário de Disponibilidade</string>
@@ -243,7 +247,6 @@
     <string name="owner_email_label">E-mail do proprietário</string>
     <string name="owner_phone_label">Telefone do proprietário</string>
     <string name="owner_phone_placeholder">Telefone não informado</string>
-    <string name="manage_availability_button">Gerenciar Disponibilidade</string>
     <string name="view_availability_button">Ver Disponibilidade</string>
     <string name="send_message_button">Enviar Mensagem</string>
     <string name="profile_data_title">Dados do Perfil</string>

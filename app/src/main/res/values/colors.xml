@@ -56,4 +56,24 @@
     <color name="divider_color">#E0E0E0</color>
     <color name="nav_header_beige_light">#F8F5ED</color>
     <color name="nav_header_beige_dark">#F0EDE5</color>
+    
+    <!-- Cores personalizadas para background -->
+    <color name="custom_background_1">#FF6B4A</color>  <!-- Laranja vibrante -->
+    <color name="custom_background_2">#FF8B4A</color>  <!-- Laranja atual -->
+    <color name="custom_background_3">#FF5722</color>  <!-- Laranja escuro -->
+    <color name="custom_background_4">#E65100</color>  <!-- Laranja queimado -->
+    <color name="custom_background_5">#FF7043</color>  <!-- Laranja suave -->
+    <color name="custom_background_6">#FF9800</color>  <!-- Laranja Material -->
+    <color name="custom_background_7">#F57C00</color>  <!-- Laranja profundo -->
+    <color name="custom_background_8">#FFAB40</color>  <!-- Laranja claro -->
+    
+    <!-- Cor personalizada baseada na imagem anexada -->
+    <color name="terracotta_orange">#CC5A3A</color>    <!-- Laranja terracota -->
+    <color name="burnt_orange">#D2691E</color>         <!-- Laranja queimado -->
+    <color name="warm_terracotta">#CD853F</color>      <!-- Terracota quente -->
+    
+    <!-- Cores para status das solicitações -->
+    <color name="status_pending">#FF8B4A</color>       <!-- Laranja para pendente -->
+    <color name="status_accepted">#4CAF50</color>      <!-- Verde para aceita -->
+    <color name="status_rejected">#F44336</color>      <!-- Vermelho para recusada -->
 </resources>

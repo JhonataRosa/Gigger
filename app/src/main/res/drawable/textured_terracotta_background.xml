@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Camada base com a cor terracota -->
+    <item>
+        <shape>
+            <solid android:color="#CC5A3A" />
+        </shape>
+    </item>
+    
+    <!-- Camada de textura sutil -->
+    <item>
+        <shape>
+            <solid android:color="#CC5A3A" />
+            <size android:width="2dp" android:height="2dp" />
+        </shape>
+    </item>
+    
+</layer-list>

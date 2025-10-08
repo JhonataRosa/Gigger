@@ -74,7 +74,7 @@ public class FirebaseChat {
     public static FirebaseChat fromDocument(DocumentSnapshot document) {
         FirebaseChat chat = new FirebaseChat();
         chat.id = document.getId();
-        chat.instrumentId = document.getString("instrumentId");
+        chat.instrumentId = document.getString("idInstrumento");
         chat.locatorId = document.getString("locatorId");
         chat.ownerId = document.getString("ownerId");
         chat.status = document.getString("status");

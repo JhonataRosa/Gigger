@@ -101,6 +101,7 @@ public class AtividadeChat extends AppCompatActivity {
         campoMensagem = findViewById(R.id.messageEditText);
         botaoEnviar = findViewById(R.id.sendButton);
         textoNomeInstrumento = findViewById(R.id.instrumentNameTextView);
+        ImageButton botaoExcluir = findViewById(R.id.deleteChatButton);
 
         listaMensagens.setLayoutManager(new LinearLayoutManager(this));
         FirebaseUser cu = autenticacao.getCurrentUser();
@@ -108,6 +109,9 @@ public class AtividadeChat extends AppCompatActivity {
         listaMensagens.setAdapter(adaptadorMensagens);
 
         botaoEnviar.setOnClickListener(v -> sendMessage());
+        
+        // Configurar botão de exclusão
+        botaoExcluir.setOnClickListener(v -> mostrarDialogExclusao());
 
         carregarCabecalhoEMensagens();
     }
@@ -234,6 +238,56 @@ public class AtividadeChat extends AppCompatActivity {
                 .exceptionally(throwable -> {
                     Log.e(TAG, "Erro ao enviar mensagem: " + throwable.getMessage(), throwable);
                     runOnUiThread(() -> Toast.makeText(this, getString(R.string.error_generic), Toast.LENGTH_SHORT).show());
+                    return null;
+                });
+    }
+    
+    /**
+     * Mostra dialog de confirmação para exclusão da conversa
+     */
+    private void mostrarDialogExclusao() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Excluir Conversa")
+                .setMessage("Tem certeza que deseja excluir esta conversa?\n\nAs mensagens só serão apagadas definitivamente se ambos os usuários excluírem a conversa.")
+                .setPositiveButton("Excluir", (dialog, which) -> {
+                    excluirConversa();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+    
+    /**
+     * Exclui a conversa atual
+     */
+    private void excluirConversa() {
+        String chatId = getIntent().getStringExtra("chat_id");
+        FirebaseUser usuarioAtual = autenticacao.getCurrentUser();
+        
+        if (chatId == null || usuarioAtual == null) {
+            Toast.makeText(this, "Erro: dados da conversa não encontrados", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Log.d(TAG, "Excluindo conversa " + chatId + " para usuário " + usuarioAtual.getUid());
+        
+        // Marcar como excluída para este usuário
+        GerenciadorFirebase.marcarConversaComoExcluida(chatId, usuarioAtual.getUid())
+                .thenAccept(sucesso -> {
+                    runOnUiThread(() -> {
+                        if (sucesso) {
+                            Toast.makeText(this, "Conversa excluída com sucesso", Toast.LENGTH_SHORT).show();
+                            // Voltar para a lista de conversas
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Erro ao excluir conversa", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .exceptionally(erro -> {
+                    Log.e(TAG, "Erro ao excluir conversa: " + erro.getMessage(), erro);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Erro ao excluir conversa: " + erro.getMessage(), Toast.LENGTH_LONG).show();
+                    });
                     return null;
                 });
     }

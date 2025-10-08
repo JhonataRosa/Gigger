@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 // Imports para modelos de chat e mensagens
 import com.example.instrumentaliza.models.FirebaseChat;
 import com.example.instrumentaliza.models.FirebaseMessage;
+import com.example.instrumentaliza.models.FirebaseAvaliacao;
 
 /**
  * GerenciadorFirebase - Classe central de gerenciamento do Firebase
@@ -1349,8 +1351,11 @@ public class GerenciadorFirebase {
                                 todosChats.addAll(chatsComoLocatario);
                                 todosChats.addAll(chatsComoProprietario);
                                 
+                                // Filtrar chats excluídos pelo usuário atual
+                                List<DocumentSnapshot> chatsNaoExcluidos = filtrarChatsExcluidos(todosChats, idUsuario);
+                                
                                 // Filtrar apenas chats que têm mensagens
-                                filtrarChatsComMensagens(todosChats, futuro);
+                                filtrarChatsComMensagens(chatsNaoExcluidos, futuro);
                             })
                             .addOnFailureListener(erro -> {
                                 Log.e(TAG, "Erro ao carregar chats como owner: " + erro.getMessage(), erro);
@@ -1363,6 +1368,28 @@ public class GerenciadorFirebase {
                 });
         
         return futuro;
+    }
+    
+    /**
+     * Filtra chats que não foram excluídos pelo usuário atual
+     */
+    private static List<DocumentSnapshot> filtrarChatsExcluidos(List<DocumentSnapshot> todosChats, String idUsuario) {
+        List<DocumentSnapshot> chatsNaoExcluidos = new ArrayList<>();
+        
+        for (DocumentSnapshot chat : todosChats) {
+            List<String> usuariosExcluidos = (List<String>) chat.get("usuariosExcluidos");
+            
+            // Se não há lista de usuários excluídos ou o usuário atual não está na lista
+            if (usuariosExcluidos == null || !usuariosExcluidos.contains(idUsuario)) {
+                chatsNaoExcluidos.add(chat);
+                Log.d(TAG, "Chat incluído (não excluído): " + chat.getId());
+            } else {
+                Log.d(TAG, "Chat excluído pelo usuário, removendo da lista: " + chat.getId());
+            }
+        }
+        
+        Log.d(TAG, "Chats filtrados: " + chatsNaoExcluidos.size() + " de " + todosChats.size() + " (excluídos: " + (todosChats.size() - chatsNaoExcluidos.size()) + ")");
+        return chatsNaoExcluidos;
     }
     
     /**
@@ -1546,6 +1573,1513 @@ public class GerenciadorFirebase {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Erro ao buscar chats para limpeza: " + e.getMessage(), e);
                     futuro.completeExceptionally(e);
+                });
+        
+        return futuro;
+    }
+    
+    // ==================== SOLICITAÇÕES DE RESERVA ====================
+    // Seção responsável por gerenciamento de solicitações de reserva
+    
+    /**
+     * Criar uma nova solicitação de reserva
+     */
+    public static CompletableFuture<String> criarSolicitacaoReserva(com.example.instrumentaliza.models.FirebaseSolicitacao solicitacao) {
+        CompletableFuture<String> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Criando solicitação de reserva para instrumento: " + solicitacao.getInstrumentoId());
+        Log.d(TAG, "Dados da solicitação: " + solicitacao.toString());
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em criarSolicitacaoReserva");
+        } else {
+            Log.d(TAG, "Firestore já estava inicializado");
+        }
+        
+        Map<String, Object> dadosSolicitacao = new HashMap<>();
+        dadosSolicitacao.put("solicitanteId", solicitacao.getSolicitanteId());
+        dadosSolicitacao.put("proprietarioId", solicitacao.getProprietarioId());
+        dadosSolicitacao.put("instrumentoId", solicitacao.getInstrumentoId());
+        dadosSolicitacao.put("instrumentoNome", solicitacao.getInstrumentoNome());
+        dadosSolicitacao.put("solicitanteNome", solicitacao.getSolicitanteNome());
+        dadosSolicitacao.put("solicitanteEmail", solicitacao.getSolicitanteEmail());
+        dadosSolicitacao.put("solicitanteTelefone", solicitacao.getSolicitanteTelefone());
+        dadosSolicitacao.put("dataInicio", new Timestamp(solicitacao.getDataInicio()));
+        dadosSolicitacao.put("dataFim", new Timestamp(solicitacao.getDataFim()));
+        dadosSolicitacao.put("precoTotal", solicitacao.getPrecoTotal());
+        dadosSolicitacao.put("status", solicitacao.getStatus());
+        Log.d(TAG, "Status sendo salvo: '" + solicitacao.getStatus() + "'");
+        dadosSolicitacao.put("observacoes", solicitacao.getObservacoes());
+        dadosSolicitacao.put("lida", false); // Campo para controlar notificações
+        dadosSolicitacao.put("dataCriacao", Timestamp.now());
+        dadosSolicitacao.put("dataAtualizacao", Timestamp.now());
+        
+        Log.d(TAG, "Tentando adicionar documento à coleção 'solicitacoes'");
+        Log.d(TAG, "Dados que serão salvos:");
+        for (Map.Entry<String, Object> entry : dadosSolicitacao.entrySet()) {
+            Log.d(TAG, "  " + entry.getKey() + ": " + entry.getValue());
+        }
+        
+        firestore.collection("solicitacoes")
+                .add(dadosSolicitacao)
+                .addOnSuccessListener(referenciaDocumento -> {
+                    String idSolicitacao = referenciaDocumento.getId();
+                    Log.d(TAG, "✓ Solicitação criada com sucesso: " + idSolicitacao);
+                    Log.d(TAG, "Referência do documento: " + referenciaDocumento.getPath());
+                    Log.d(TAG, "Coleção: solicitacoes");
+                    futuro.complete(idSolicitacao);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao criar solicitação: " + erro.getMessage(), erro);
+                    Log.e(TAG, "Stack trace do erro: ", erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verifica e atualiza solicitações pendentes expiradas para RECUSADA
+     * 
+     * @param usuarioId ID do usuário para buscar apenas suas solicitações
+     * @return CompletableFuture com número de solicitações atualizadas
+     */
+    public static CompletableFuture<Integer> verificarEAtualizarSolicitacoesExpiradas(String usuarioId) {
+        CompletableFuture<Integer> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== VERIFICANDO SOLICITAÇÕES EXPIRADAS PARA USUÁRIO: " + usuarioId + " ===");
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        Date hoje = new Date();
+        Log.d(TAG, "Data atual: " + hoje);
+        
+        // Buscar solicitações onde o usuário é proprietário (recebidas)
+        firestore.collection("solicitacoes")
+                .whereEqualTo("status", "PENDENTE")
+                .whereEqualTo("proprietarioId", usuarioId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    final int[] atualizadas = {0}; // Array para ser final
+                    List<Task<Void>> tarefas = new ArrayList<>();
+                    
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Timestamp dataFimTimestamp = doc.getTimestamp("dataFim");
+                        if (dataFimTimestamp != null) {
+                            Date dataFim = dataFimTimestamp.toDate();
+                            Log.d(TAG, "Verificando solicitação " + doc.getId() + " - Data fim: " + dataFim);
+                            
+                            if (dataFim.before(hoje)) {
+                                Log.d(TAG, "Solicitação expirada, atualizando para RECUSADA: " + doc.getId());
+                                
+                                Task<Void> updateTask = doc.getReference().update(
+                                    "status", "RECUSADA",
+                                    "motivoRecusa", "Período solicitado expirado",
+                                    "dataAtualizacao", Timestamp.now()
+                                );
+                                tarefas.add(updateTask);
+                                atualizadas[0]++;
+                            }
+                        }
+                    }
+                    
+                    if (tarefas.isEmpty()) {
+                        Log.d(TAG, "Nenhuma solicitação expirada encontrada");
+                        futuro.complete(0);
+                    } else {
+                        Tasks.whenAll(tarefas)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d(TAG, "Solicitações expiradas atualizadas: " + atualizadas[0]);
+                                    futuro.complete(atualizadas[0]);
+                                })
+                                .addOnFailureListener(erro -> {
+                                    Log.e(TAG, "Erro ao atualizar solicitações expiradas: " + erro.getMessage(), erro);
+                                    futuro.completeExceptionally(erro);
+                                });
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar solicitações pendentes: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+
+    /**
+     * Atualiza reservas existentes que não possuem o campo ownerId
+     * 
+     * @param usuarioId ID do usuário para buscar apenas suas reservas
+     * @return CompletableFuture com número de reservas atualizadas
+     */
+    public static CompletableFuture<Integer> atualizarReservasSemOwnerId(String usuarioId) {
+        CompletableFuture<Integer> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ATUALIZANDO RESERVAS SEM OWNERID PARA USUÁRIO: " + usuarioId + " ===");
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        // Buscar reservas onde ownerId é null E o usuário está envolvido (como locatário)
+        firestore.collection("reservations")
+                .whereEqualTo("userId", usuarioId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    final int[] atualizadas = {0};
+                    List<Task<Void>> tarefas = new ArrayList<>();
+                    
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        String ownerId = doc.getString("ownerId");
+                        
+                        // Só atualizar se ownerId for null
+                        if (ownerId == null) {
+                            String instrumentId = doc.getString("instrumentId");
+                            if (instrumentId != null) {
+                                Log.d(TAG, "Atualizando reserva " + doc.getId() + " - instrumentId: " + instrumentId);
+                            
+                            // Buscar o ownerId do instrumento
+                            firestore.collection("instruments").document(instrumentId)
+                                    .get()
+                                    .addOnSuccessListener(instrumentDoc -> {
+                                        if (instrumentDoc.exists()) {
+                                            String instrumentOwnerId = instrumentDoc.getString("ownerId");
+                                            if (instrumentOwnerId != null) {
+                                                Log.d(TAG, "Encontrado ownerId: " + instrumentOwnerId + " para instrumento: " + instrumentId);
+                                                
+                                                Task<Void> updateTask = doc.getReference().update("ownerId", instrumentOwnerId);
+                                                tarefas.add(updateTask);
+                                                atualizadas[0]++;
+                                            }
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                    
+                    // Processar as tarefas se houver alguma
+                    if (tarefas.isEmpty()) {
+                        Log.d(TAG, "Nenhuma reserva precisa ser atualizada");
+                        futuro.complete(0);
+                    } else {
+                        Tasks.whenAll(tarefas)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d(TAG, "Reservas atualizadas: " + atualizadas[0]);
+                                    futuro.complete(atualizadas[0]);
+                                })
+                                .addOnFailureListener(erro -> {
+                                    Log.e(TAG, "Erro ao atualizar reservas: " + erro.getMessage(), erro);
+                                    futuro.completeExceptionally(erro);
+                                });
+                    }
+                    
+                    if (querySnapshot.isEmpty()) {
+                        Log.d(TAG, "Nenhuma reserva sem ownerId encontrada");
+                        futuro.complete(0);
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar reservas sem ownerId: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+
+    /**
+     * Marca uma solicitação como lida
+     */
+    public static CompletableFuture<Boolean> marcarSolicitacaoComoLida(String solicitacaoId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Marcando solicitação como lida: " + solicitacaoId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        Map<String, Object> atualizacoes = new HashMap<>();
+        atualizacoes.put("lida", true);
+        atualizacoes.put("dataLeitura", Timestamp.now());
+        
+        firestore.collection("solicitacoes").document(solicitacaoId)
+                .update(atualizacoes)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Solicitação marcada como lida com sucesso");
+                    futuro.complete(true);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao marcar solicitação como lida: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Buscar solicitações de um proprietário
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> buscarSolicitacoesProprietario(String idProprietario) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== BUSCANDO SOLICITAÇÕES DO PROPRIETÁRIO ===");
+        Log.d(TAG, "ID do proprietário: " + idProprietario);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em buscarSolicitacoesProprietario");
+        }
+        
+        Log.d(TAG, "Executando consulta: collection('solicitacoes').whereEqualTo('proprietarioId', '" + idProprietario + "')");
+        
+        firestore.collection("solicitacoes")
+                .whereEqualTo("proprietarioId", idProprietario)
+                .get()
+                .addOnSuccessListener(snapshotConsulta -> {
+                    List<DocumentSnapshot> solicitacoes = snapshotConsulta.getDocuments();
+                    Log.d(TAG, "✓ Consulta executada com sucesso!");
+                    Log.d(TAG, "Total de solicitações encontradas: " + solicitacoes.size());
+                    
+                    // Ordenar por data de criação (mais recente primeiro)
+                    solicitacoes.sort((doc1, doc2) -> {
+                        Timestamp timestamp1 = (Timestamp) doc1.get("dataCriacao");
+                        Timestamp timestamp2 = (Timestamp) doc2.get("dataCriacao");
+                        
+                        if (timestamp1 == null || timestamp2 == null) return 0;
+                        
+                        return timestamp2.compareTo(timestamp1); // Descendente
+                    });
+                    
+                    // Log de cada documento encontrado
+                    for (int i = 0; i < solicitacoes.size(); i++) {
+                        DocumentSnapshot doc = solicitacoes.get(i);
+                        Log.d(TAG, "Documento " + (i+1) + ": " + doc.getId());
+                        Log.d(TAG, "  - proprietarioId: " + doc.getString("proprietarioId"));
+                        Log.d(TAG, "  - instrumentoId: " + doc.getString("instrumentoId"));
+                        Log.d(TAG, "  - status: " + doc.getString("status"));
+                        Log.d(TAG, "  - dataCriacao: " + doc.get("dataCriacao"));
+                    }
+                    
+                    futuro.complete(solicitacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar solicitações: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Buscar solicitações de um solicitante
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> buscarSolicitacoesSolicitante(String idSolicitante) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Buscando solicitações do solicitante: " + idSolicitante);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em buscarSolicitacoesSolicitante");
+        }
+        
+        firestore.collection("solicitacoes")
+                .whereEqualTo("solicitanteId", idSolicitante)
+                .get()
+                .addOnSuccessListener(snapshotConsulta -> {
+                    List<DocumentSnapshot> solicitacoes = snapshotConsulta.getDocuments();
+                    Log.d(TAG, "Solicitações encontradas: " + solicitacoes.size());
+                    
+                    // Ordenar por data de criação (mais recente primeiro)
+                    solicitacoes.sort((doc1, doc2) -> {
+                        Timestamp timestamp1 = (Timestamp) doc1.get("dataCriacao");
+                        Timestamp timestamp2 = (Timestamp) doc2.get("dataCriacao");
+                        
+                        if (timestamp1 == null || timestamp2 == null) return 0;
+                        
+                        return timestamp2.compareTo(timestamp1); // Descendente
+                    });
+                    
+                    futuro.complete(solicitacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar solicitações: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Aceitar uma solicitação de reserva
+     */
+    public static CompletableFuture<Boolean> aceitarSolicitacao(String idSolicitacao) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Aceitando solicitação: " + idSolicitacao);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em aceitarSolicitacao");
+        }
+        
+        Map<String, Object> atualizacoes = new HashMap<>();
+        atualizacoes.put("status", "ACEITA");
+        atualizacoes.put("dataAtualizacao", Timestamp.now());
+        
+        firestore.collection("solicitacoes").document(idSolicitacao)
+                .update(atualizacoes)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Solicitação aceita com sucesso");
+                    futuro.complete(true);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao aceitar solicitação: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Recusar uma solicitação de reserva
+     */
+    public static CompletableFuture<Boolean> recusarSolicitacao(String idSolicitacao, String motivoRecusa) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Recusando solicitação: " + idSolicitacao + " - Motivo: " + motivoRecusa);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em recusarSolicitacao");
+        }
+        
+        Map<String, Object> atualizacoes = new HashMap<>();
+        atualizacoes.put("status", "RECUSADA");
+        atualizacoes.put("motivoRecusa", motivoRecusa);
+        atualizacoes.put("dataAtualizacao", Timestamp.now());
+        
+        firestore.collection("solicitacoes").document(idSolicitacao)
+                .update(atualizacoes)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Solicitação recusada com sucesso");
+                    futuro.complete(true);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao recusar solicitação: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Obter solicitação por ID
+     */
+    public static CompletableFuture<DocumentSnapshot> obterSolicitacaoPorId(String idSolicitacao) {
+        CompletableFuture<DocumentSnapshot> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Obtendo solicitação por ID: " + idSolicitacao);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em obterSolicitacaoPorId");
+        }
+        
+        firestore.collection("solicitacoes").document(idSolicitacao)
+                .get()
+                .addOnSuccessListener(documento -> {
+                    if (documento.exists()) {
+                        Log.d(TAG, "Solicitação encontrada");
+                        futuro.complete(documento);
+                    } else {
+                        Log.w(TAG, "Solicitação não encontrada");
+                        futuro.completeExceptionally(new Exception("Solicitação não encontrada"));
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter solicitação: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verificar se já existe solicitação pendente para o mesmo período
+     */
+    public static CompletableFuture<Boolean> verificarSolicitacaoExistente(String idInstrumento, String idSolicitante, Date dataInicio, Date dataFim) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Verificando solicitação existente para instrumento: " + idInstrumento);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em verificarSolicitacaoExistente");
+        }
+        
+        firestore.collection("solicitacoes")
+                .whereEqualTo("instrumentoId", idInstrumento)
+                .whereEqualTo("solicitanteId", idSolicitante)
+                .whereEqualTo("status", "PENDENTE")
+                .get()
+                .addOnSuccessListener(snapshotConsulta -> {
+                    boolean existeSolicitacao = false;
+                    
+                    for (DocumentSnapshot documento : snapshotConsulta.getDocuments()) {
+                        Timestamp timestampInicio = (Timestamp) documento.get("dataInicio");
+                        Timestamp timestampFim = (Timestamp) documento.get("dataFim");
+                        
+                        if (timestampInicio != null && timestampFim != null) {
+                            Date docInicio = timestampInicio.toDate();
+                            Date docFim = timestampFim.toDate();
+                            
+                            // Verificar sobreposição de datas
+                            if ((dataInicio.before(docFim) || dataInicio.equals(docFim)) &&
+                                (dataFim.after(docInicio) || dataFim.equals(docInicio))) {
+                                existeSolicitacao = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    Log.d(TAG, "Solicitação existente encontrada: " + existeSolicitacao);
+                    futuro.complete(existeSolicitacao);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar solicitação existente: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Converter solicitação aceita em reserva ativa
+     */
+    public static CompletableFuture<Boolean> converterSolicitacaoEmReserva(String idSolicitacao) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== CONVERTENDO SOLICITAÇÃO EM RESERVA ===");
+        Log.d(TAG, "ID da solicitação: " + idSolicitacao);
+        
+        // Primeiro obter os dados da solicitação
+        obterSolicitacaoPorId(idSolicitacao)
+                .thenAccept(solicitacaoDoc -> {
+                    if (!solicitacaoDoc.exists()) {
+                        futuro.completeExceptionally(new RuntimeException("Solicitação não encontrada"));
+                        return;
+                    }
+                    
+                    // Criar reserva ativa
+                    Map<String, Object> dadosReserva = new HashMap<>();
+                    String solicitanteId = solicitacaoDoc.getString("solicitanteId");
+                    String proprietarioId = solicitacaoDoc.getString("proprietarioId");
+                    String instrumentoId = solicitacaoDoc.getString("instrumentoId");
+                    
+                    Log.d(TAG, "Dados da solicitação:");
+                    Log.d(TAG, "  - solicitanteId: " + solicitanteId);
+                    Log.d(TAG, "  - proprietarioId: " + proprietarioId);
+                    Log.d(TAG, "  - instrumentoId: " + instrumentoId);
+                    
+                    dadosReserva.put("userId", solicitanteId);
+                    dadosReserva.put("ownerId", proprietarioId);
+                    dadosReserva.put("instrumentId", instrumentoId);
+                    dadosReserva.put("startDate", solicitacaoDoc.get("dataInicio"));
+                    dadosReserva.put("endDate", solicitacaoDoc.get("dataFim"));
+                    dadosReserva.put("totalPrice", solicitacaoDoc.getDouble("precoTotal"));
+                    dadosReserva.put("status", "CONFIRMED");
+                    dadosReserva.put("createdAt", Timestamp.now());
+                    
+                    // Garantir que firestore está inicializado
+                    if (firestore == null) {
+                        firestore = FirebaseFirestore.getInstance();
+                    }
+                    
+                    // Criar reserva e atualizar disponibilidade do instrumento
+                    Timestamp dataInicio = solicitacaoDoc.getTimestamp("dataInicio");
+                    Timestamp dataFim = solicitacaoDoc.getTimestamp("dataFim");
+                    
+                    Log.d(TAG, "Criando reserva e atualizando disponibilidade do instrumento: " + instrumentoId);
+                    Log.d(TAG, "Período: " + dataInicio.toDate() + " a " + dataFim.toDate());
+                    
+                    // Primeiro criar a reserva
+                    Log.d(TAG, "Criando reserva na coleção 'reservations'...");
+                    firestore.collection("reservations").add(dadosReserva)
+                            .addOnSuccessListener(referenciaReserva -> {
+                                Log.d(TAG, "=== RESERVA CRIADA COM SUCESSO ===");
+                                Log.d(TAG, "ID da reserva: " + referenciaReserva.getId());
+                                Log.d(TAG, "userId: " + solicitanteId);
+                                Log.d(TAG, "ownerId: " + proprietarioId);
+                                Log.d(TAG, "instrumentId: " + instrumentoId);
+                                
+                                // Depois atualizar a disponibilidade do instrumento
+                                atualizarDisponibilidadeInstrumento(instrumentoId, dataInicio, dataFim)
+                                        .thenAccept(sucesso -> {
+                                            if (sucesso) {
+                                                Log.d(TAG, "Disponibilidade do instrumento atualizada com sucesso");
+                                                futuro.complete(true);
+                                            } else {
+                                                Log.e(TAG, "Falha ao atualizar disponibilidade do instrumento");
+                                                futuro.completeExceptionally(new RuntimeException("Falha ao atualizar disponibilidade"));
+                                            }
+                                        })
+                                        .exceptionally(erro -> {
+                                            Log.e(TAG, "Erro ao atualizar disponibilidade: " + erro.getMessage(), erro);
+                                            futuro.completeExceptionally(erro);
+                                            return null;
+                                        });
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao criar reserva: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .exceptionally(erro -> {
+                    Log.e(TAG, "Erro ao obter solicitação: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                    return null;
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Buscar reservas de um usuário
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> buscarReservasUsuario(String idUsuario) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== BUSCANDO RESERVAS DO USUÁRIO ===");
+        Log.d(TAG, "ID do usuário: " + idUsuario);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em buscarReservasUsuario");
+        }
+        
+        Log.d(TAG, "Executando consulta: collection('reservations').whereEqualTo('userId', '" + idUsuario + "')");
+        
+        firestore.collection("reservations")
+                .whereEqualTo("userId", idUsuario)
+                .get()
+                .addOnSuccessListener(snapshotConsulta -> {
+                    List<DocumentSnapshot> reservas = snapshotConsulta.getDocuments();
+                    Log.d(TAG, "✓ Consulta executada com sucesso!");
+                    Log.d(TAG, "Total de reservas encontradas: " + reservas.size());
+                    
+                    // Ordenar por data de criação (mais recente primeiro)
+                    reservas.sort((doc1, doc2) -> {
+                        Timestamp timestamp1 = (Timestamp) doc1.get("createdAt");
+                        Timestamp timestamp2 = (Timestamp) doc2.get("createdAt");
+                        
+                        if (timestamp1 == null || timestamp2 == null) return 0;
+                        
+                        return timestamp2.compareTo(timestamp1); // Descendente
+                    });
+                    
+                    // Log de cada documento encontrado
+                    for (int i = 0; i < reservas.size(); i++) {
+                        DocumentSnapshot doc = reservas.get(i);
+                        Log.d(TAG, "Reserva " + (i+1) + ": " + doc.getId());
+                        Log.d(TAG, "  - userId: " + doc.getString("userId"));
+                        Log.d(TAG, "  - instrumentId: " + doc.getString("instrumentId"));
+                        Log.d(TAG, "  - status: " + doc.getString("status"));
+                        Log.d(TAG, "  - totalPrice: " + doc.getDouble("totalPrice"));
+                    }
+                    
+                    futuro.complete(reservas);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar reservas: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Atualiza a disponibilidade do instrumento ao aceitar uma solicitação
+     * 
+     * Adiciona o período da reserva à lista de períodos indisponíveis do instrumento,
+     * garantindo que as datas não possam ser solicitadas novamente.
+     * 
+     * @param instrumentoId ID do instrumento
+     * @param dataInicio Data de início da reserva
+     * @param dataFim Data de fim da reserva
+     * @return CompletableFuture com resultado da operação
+     */
+    public static CompletableFuture<Boolean> atualizarDisponibilidadeInstrumento(String instrumentoId, 
+            Timestamp dataInicio, Timestamp dataFim) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ATUALIZANDO DISPONIBILIDADE DO INSTRUMENTO ===");
+        Log.d(TAG, "Instrumento: " + instrumentoId);
+        Log.d(TAG, "Período: " + dataInicio.toDate() + " a " + dataFim.toDate());
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em atualizarDisponibilidadeInstrumento");
+        }
+        
+        // Criar o período indisponível
+        Map<String, Object> periodoIndisponivel = new HashMap<>();
+        periodoIndisponivel.put("startDate", dataInicio);
+        periodoIndisponivel.put("endDate", dataFim);
+        periodoIndisponivel.put("type", "reservation");
+        periodoIndisponivel.put("createdAt", Timestamp.now());
+        
+        // Primeiro obter o documento do instrumento
+        firestore.collection("instruments").document(instrumentoId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Log.e(TAG, "Instrumento não encontrado: " + instrumentoId);
+                        futuro.completeExceptionally(new RuntimeException("Instrumento não encontrado"));
+                        return;
+                    }
+                    
+                    // Obter lista atual de períodos indisponíveis
+                    List<Map<String, Object>> periodosIndisponiveis = 
+                            (List<Map<String, Object>>) documentSnapshot.get("unavailableRanges");
+                    
+                    if (periodosIndisponiveis == null) {
+                        periodosIndisponiveis = new ArrayList<>();
+                    }
+                    
+                    // Adicionar o novo período indisponível
+                    periodosIndisponiveis.add(periodoIndisponivel);
+                    
+                    Log.d(TAG, "Adicionando período indisponível. Total de períodos: " + periodosIndisponiveis.size());
+                    
+                    // Atualizar o documento do instrumento
+                    Map<String, Object> atualizacoes = new HashMap<>();
+                    atualizacoes.put("unavailableRanges", periodosIndisponiveis);
+                    
+                    firestore.collection("instruments").document(instrumentoId)
+                            .update(atualizacoes)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Disponibilidade do instrumento atualizada com sucesso");
+                                futuro.complete(true);
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao atualizar disponibilidade: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter instrumento: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verifica se um período está disponível para reserva
+     * 
+     * Checa se o período solicitado não conflita com períodos já
+     * indisponíveis ou reservas existentes do instrumento.
+     * 
+     * @param instrumentoId ID do instrumento
+     * @param dataInicio Data de início solicitada
+     * @param dataFim Data de fim solicitada
+     * @return CompletableFuture com resultado da verificação
+     */
+    public static CompletableFuture<Boolean> verificarDisponibilidadePeriodo(String instrumentoId, 
+            Timestamp dataInicio, Timestamp dataFim) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== VERIFICANDO DISPONIBILIDADE DO PERÍODO ===");
+        Log.d(TAG, "Instrumento: " + instrumentoId);
+        Log.d(TAG, "Período solicitado: " + dataInicio.toDate() + " a " + dataFim.toDate());
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        // Primeiro verificar períodos indisponíveis do instrumento
+        firestore.collection("instruments").document(instrumentoId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Log.e(TAG, "Instrumento não encontrado: " + instrumentoId);
+                        futuro.completeExceptionally(new RuntimeException("Instrumento não encontrado"));
+                        return;
+                    }
+                    
+                    // Verificar períodos indisponíveis
+                    List<Map<String, Object>> periodosIndisponiveis = 
+                            (List<Map<String, Object>>) documentSnapshot.get("unavailableRanges");
+                    
+                    if (periodosIndisponiveis != null && !periodosIndisponiveis.isEmpty()) {
+                        for (Map<String, Object> periodo : periodosIndisponiveis) {
+                            Timestamp inicioExistente = (Timestamp) periodo.get("startDate");
+                            Timestamp fimExistente = (Timestamp) periodo.get("endDate");
+                            
+                            if (inicioExistente != null && fimExistente != null) {
+                                // Verificar sobreposição de datas
+                                boolean sobrepoe = (dataInicio.toDate().before(fimExistente.toDate()) && 
+                                                   dataFim.toDate().after(inicioExistente.toDate()));
+                                
+                                if (sobrepoe) {
+                                    Log.d(TAG, "Período indisponível encontrado: " + inicioExistente.toDate() + " a " + fimExistente.toDate());
+                                    futuro.complete(false);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Se chegou até aqui, verificar também reservas ativas
+                    verificarReservasAtivas(instrumentoId, dataInicio, dataFim)
+                            .thenAccept(disponivel -> {
+                                Log.d(TAG, "Verificação de disponibilidade concluída: " + disponivel);
+                                futuro.complete(disponivel);
+                            })
+                            .exceptionally(erro -> {
+                                Log.e(TAG, "Erro ao verificar reservas: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                                return null;
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar instrumento: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verifica se há reservas ativas conflitantes
+     */
+    private static CompletableFuture<Boolean> verificarReservasAtivas(String instrumentoId, 
+            Timestamp dataInicio, Timestamp dataFim) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        firestore.collection("reservations")
+                .whereEqualTo("instrumentId", instrumentoId)
+                .whereEqualTo("status", "CONFIRMED")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    boolean disponivel = true;
+                    
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Timestamp inicioReserva = doc.getTimestamp("startDate");
+                        Timestamp fimReserva = doc.getTimestamp("endDate");
+                        
+                        if (inicioReserva != null && fimReserva != null) {
+                            boolean sobrepoe = (dataInicio.toDate().before(fimReserva.toDate()) && 
+                                               dataFim.toDate().after(inicioReserva.toDate()));
+                            
+                            if (sobrepoe) {
+                                Log.d(TAG, "Reserva ativa conflitante encontrada: " + inicioReserva.toDate() + " a " + fimReserva.toDate());
+                                disponivel = false;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    futuro.complete(disponivel);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar reservas ativas: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    // ==========================================
+    // MÉTODOS DE GERENCIAMENTO DE AVALIAÇÕES
+    // ==========================================
+    
+    /**
+     * Enviar uma avaliação de usuário (locatário)
+     * 
+     * @param avaliacao Avaliação de usuário a ser enviada
+     * @return CompletableFuture<Boolean> indicando sucesso
+     */
+    public static CompletableFuture<Boolean> enviarAvaliacaoUsuario(com.example.instrumentaliza.models.FirebaseAvaliacaoUsuario avaliacao) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ENVIANDO AVALIAÇÃO DE USUÁRIO ===");
+        Log.d(TAG, "Locatário: " + avaliacao.getLocatarioNome());
+        Log.d(TAG, "Nota: " + avaliacao.getNota());
+        Log.d(TAG, "Comentário: " + avaliacao.getComentario());
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        // Verificar se já existe avaliação para esta reserva
+        firestore.collection("avaliacoes_usuarios")
+                .whereEqualTo("reservaId", avaliacao.getReservaId())
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        Log.w(TAG, "Já existe avaliação de usuário para esta reserva");
+                        futuro.complete(false);
+                        return;
+                    }
+                    
+                    // Adicionar avaliação de usuário
+                    Log.d(TAG, "Dados a serem enviados: " + avaliacao.toMap());
+                    
+                    firestore.collection("avaliacoes_usuarios")
+                            .add(avaliacao.toMap())
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Avaliação de usuário enviada com sucesso: " + documentReference.getId());
+                                futuro.complete(true);
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao enviar avaliação de usuário: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar avaliação de usuário existente: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Envia uma avaliação para o Firebase
+     * 
+     * @param avaliacao Objeto FirebaseAvaliacao com os dados da avaliação
+     * @return CompletableFuture<Boolean> indicando sucesso
+     */
+    public static CompletableFuture<Boolean> enviarAvaliacao(FirebaseAvaliacao avaliacao) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ENVIANDO AVALIAÇÃO ===");
+        Log.d(TAG, "Instrumento: " + avaliacao.getInstrumentoNome());
+        Log.d(TAG, "Nota: " + avaliacao.getNota());
+        Log.d(TAG, "Comentário: " + avaliacao.getComentario());
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em enviarAvaliacao");
+        }
+        
+        // Validar avaliação
+        if (!avaliacao.isValid()) {
+            Log.e(TAG, "Avaliação inválida");
+            futuro.complete(false);
+            return futuro;
+        }
+        
+        // Verificar se já existe avaliação para esta reserva
+        firestore.collection("avaliacoes")
+                .whereEqualTo("reservaId", avaliacao.getReservaId())
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        Log.w(TAG, "Já existe avaliação para esta reserva");
+                        futuro.complete(false);
+                        return;
+                    }
+                    
+                    // Adicionar avaliação
+                    firestore.collection("avaliacoes")
+                            .add(avaliacao.toMap())
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Avaliação enviada com sucesso: " + documentReference.getId());
+                                
+                                // Atualizar nota média do instrumento
+                                atualizarNotaMediaInstrumento(avaliacao.getInstrumentoId())
+                                        .thenAccept(sucesso -> {
+                                            Log.d(TAG, "Nota média do instrumento atualizada: " + sucesso);
+                                            futuro.complete(true);
+                                        })
+                                        .exceptionally(erro -> {
+                                            Log.e(TAG, "Erro ao atualizar nota média: " + erro.getMessage(), erro);
+                                            futuro.complete(true); // Ainda consideramos sucesso
+                                            return null;
+                                        });
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao enviar avaliação: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar avaliações existentes: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Obtém todas as avaliações de um instrumento
+     * 
+     * @param instrumentoId ID do instrumento
+     * @return CompletableFuture<List<DocumentSnapshot>> com as avaliações
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> obterAvaliacoesInstrumento(String instrumentoId) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== OBTENDO AVALIAÇÕES DO INSTRUMENTO ===");
+        Log.d(TAG, "Instrumento: " + instrumentoId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("avaliacoes")
+                .whereEqualTo("instrumentoId", instrumentoId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> avaliacoes = querySnapshot.getDocuments();
+                    Log.d(TAG, "Avaliações encontradas: " + avaliacoes.size());
+                    
+                    // Ordenar por data de avaliação (mais recentes primeiro)
+                    avaliacoes.sort((a, b) -> {
+                        Timestamp dataA = a.getTimestamp("dataAvaliacao");
+                        Timestamp dataB = b.getTimestamp("dataAvaliacao");
+                        
+                        if (dataA == null && dataB == null) return 0;
+                        if (dataA == null) return 1;
+                        if (dataB == null) return -1;
+                        
+                        return dataB.compareTo(dataA); // Descending order
+                    });
+                    
+                    futuro.complete(avaliacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter avaliações: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Obtém todas as avaliações recebidas por um proprietário
+     * 
+     * @param proprietarioId ID do proprietário
+     * @return CompletableFuture<List<DocumentSnapshot>> com as avaliações
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> obterAvaliacoesProprietario(String proprietarioId) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== OBTENDO AVALIAÇÕES DO PROPRIETÁRIO ===");
+        Log.d(TAG, "Proprietário: " + proprietarioId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("avaliacoes")
+                .whereEqualTo("proprietarioId", proprietarioId)
+                .orderBy("dataAvaliacao", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> avaliacoes = querySnapshot.getDocuments();
+                    Log.d(TAG, "Avaliações encontradas: " + avaliacoes.size());
+                    futuro.complete(avaliacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter avaliações do proprietário: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Calcula e atualiza a nota média de um instrumento
+     * 
+     * @param instrumentoId ID do instrumento
+     * @return CompletableFuture<Boolean> indicando sucesso
+     */
+    public static CompletableFuture<Boolean> atualizarNotaMediaInstrumento(String instrumentoId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ATUALIZANDO NOTA MÉDIA DO INSTRUMENTO ===");
+        Log.d(TAG, "Instrumento: " + instrumentoId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("avaliacoes")
+                .whereEqualTo("instrumentoId", instrumentoId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> avaliacoes = querySnapshot.getDocuments();
+                    
+                    if (avaliacoes.isEmpty()) {
+                        Log.d(TAG, "Nenhuma avaliação encontrada");
+                        futuro.complete(true);
+                        return;
+                    }
+                    
+                    // Calcular nota média
+                    double somaNotas = 0;
+                    for (DocumentSnapshot avaliacao : avaliacoes) {
+                        Double nota = avaliacao.getDouble("nota");
+                        if (nota != null) {
+                            somaNotas += nota;
+                        }
+                    }
+                    
+                    double notaMedia = somaNotas / avaliacoes.size();
+                    long totalAvaliacoes = avaliacoes.size();
+                    
+                    Log.d(TAG, "Nota média calculada: " + notaMedia + " (" + totalAvaliacoes + " avaliações)");
+                    
+                    // Atualizar no documento do instrumento
+                    Map<String, Object> atualizacoes = new HashMap<>();
+                    atualizacoes.put("notaMedia", notaMedia);
+                    atualizacoes.put("totalAvaliacoes", totalAvaliacoes);
+                    
+                    Log.d(TAG, "Tentando atualizar instrumento " + instrumentoId + " com nota média: " + notaMedia);
+                    
+                    firestore.collection("instruments").document(instrumentoId)
+                            .update(atualizacoes)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Nota média atualizada com sucesso no instrumento: " + instrumentoId);
+                                futuro.complete(true);
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao atualizar nota média no instrumento " + instrumentoId + ": " + erro.getMessage(), erro);
+                                
+                                // Tentar usar set() como fallback se update() falhar
+                                Log.d(TAG, "Tentando fallback com set()...");
+                                firestore.collection("instruments").document(instrumentoId)
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            if (documentSnapshot.exists()) {
+                                                Map<String, Object> dados = documentSnapshot.getData();
+                                                dados.put("notaMedia", notaMedia);
+                                                dados.put("totalAvaliacoes", totalAvaliacoes);
+                                                
+                                                firestore.collection("instruments").document(instrumentoId)
+                                                        .set(dados)
+                                                        .addOnSuccessListener(aVoid2 -> {
+                                                            Log.d(TAG, "Nota média atualizada com set() como fallback");
+                                                            futuro.complete(true);
+                                                        })
+                                                        .addOnFailureListener(erro2 -> {
+                                                            Log.e(TAG, "Erro no fallback set(): " + erro2.getMessage(), erro2);
+                                                            futuro.completeExceptionally(erro2);
+                                                        });
+                                            } else {
+                                                Log.e(TAG, "Documento do instrumento não encontrado");
+                                                futuro.completeExceptionally(new Exception("Instrumento não encontrado"));
+                                            }
+                                        })
+                                        .addOnFailureListener(erro2 -> {
+                                            Log.e(TAG, "Erro ao buscar instrumento para fallback: " + erro2.getMessage(), erro2);
+                                            futuro.completeExceptionally(erro2);
+                                        });
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao calcular nota média: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Obtém uma reserva por ID
+     * 
+     * @param reservaId ID da reserva
+     * @return CompletableFuture<DocumentSnapshot> com os dados da reserva
+     */
+    public static CompletableFuture<DocumentSnapshot> obterReservaPorId(String reservaId) {
+        CompletableFuture<DocumentSnapshot> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== OBTENDO RESERVA POR ID ===");
+        Log.d(TAG, "Reserva: " + reservaId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("reservations").document(reservaId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Log.d(TAG, "Reserva encontrada");
+                        futuro.complete(documentSnapshot);
+                    } else {
+                        Log.w(TAG, "Reserva não encontrada");
+                        futuro.complete(null);
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter reserva: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Marca uma reserva como avaliada
+     * 
+     * @param reservaId ID da reserva
+     * @return CompletableFuture<Boolean> indicando sucesso
+     */
+    public static CompletableFuture<Boolean> marcarReservaComoAvaliada(String reservaId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== MARCANDO RESERVA COMO AVALIADA ===");
+        Log.d(TAG, "Reserva: " + reservaId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        Map<String, Object> atualizacoes = new HashMap<>();
+        atualizacoes.put("avaliada", true);
+        atualizacoes.put("dataAvaliacao", Timestamp.now());
+        
+        firestore.collection("reservations").document(reservaId)
+                .update(atualizacoes)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Reserva marcada como avaliada com sucesso");
+                    futuro.complete(true);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao marcar reserva como avaliada: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Obtém um usuário por ID do Firestore
+     * 
+     * @param usuarioId ID do usuário
+     * @return CompletableFuture<DocumentSnapshot> com os dados do usuário
+     */
+    public static CompletableFuture<DocumentSnapshot> obterUsuarioPorId(String usuarioId) {
+        CompletableFuture<DocumentSnapshot> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== OBTENDO USUÁRIO POR ID ===");
+        Log.d(TAG, "Usuário: " + usuarioId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("users").document(usuarioId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Log.d(TAG, "Usuário encontrado");
+                        futuro.complete(documentSnapshot);
+                    } else {
+                        Log.w(TAG, "Usuário não encontrado");
+                        futuro.complete(null);
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao obter usuário: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Força a atualização da nota média de um instrumento específico
+     * Método de debug para testar atualizações manuais
+     * 
+     * @param instrumentoId ID do instrumento
+     */
+    public static CompletableFuture<Boolean> forcarAtualizacaoNotaMedia(String instrumentoId) {
+        Log.d(TAG, "=== FORÇANDO ATUALIZAÇÃO DA NOTA MÉDIA ===");
+        Log.d(TAG, "Instrumento: " + instrumentoId);
+        
+        return atualizarNotaMediaInstrumento(instrumentoId);
+    }
+    
+    /**
+     * Atualiza a nota média de todos os instrumentos
+     * Método de debug para corrigir dados inconsistentes
+     */
+    public static CompletableFuture<Void> atualizarTodasAsNotasMedias() {
+        Log.d(TAG, "=== ATUALIZANDO TODAS AS NOTAS MÉDIAS ===");
+        
+        CompletableFuture<Void> futuro = new CompletableFuture<>();
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        firestore.collection("instruments")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+                    
+                    for (DocumentSnapshot instrument : querySnapshot.getDocuments()) {
+                        futures.add(atualizarNotaMediaInstrumento(instrument.getId()));
+                    }
+                    
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                            .thenAccept(v -> {
+                                Log.d(TAG, "Todas as notas médias atualizadas");
+                                futuro.complete(null);
+                            })
+                            .exceptionally(throwable -> {
+                                Log.e(TAG, "Erro ao atualizar notas médias: " + throwable.getMessage(), throwable);
+                                futuro.completeExceptionally(throwable);
+                                return null;
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar instrumentos: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Marca uma conversa como excluída para um usuário específico
+     * As mensagens só são apagadas definitivamente se ambos os usuários excluírem
+     */
+    public static CompletableFuture<Boolean> marcarConversaComoExcluida(String chatId, String userId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Marcando conversa como excluída - Chat: " + chatId + ", Usuário: " + userId);
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        // Adicionar o usuário à lista de usuários que excluíram a conversa
+        firestore.collection("chats").document(chatId)
+                .update("usuariosExcluidos", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Conversa marcada como excluída com sucesso");
+                    
+                    // Verificar se ambos os usuários excluíram - se sim, apagar mensagens
+                    verificarEExcluirMensagensSeNecessario(chatId)
+                            .thenAccept(sucesso -> {
+                                futuro.complete(true);
+                            })
+                            .exceptionally(erro -> {
+                                Log.e(TAG, "Erro ao verificar exclusão de mensagens: " + erro.getMessage(), erro);
+                                futuro.complete(true); // Ainda assim marcar como sucesso para a exclusão da conversa
+                                return null;
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao marcar conversa como excluída: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verifica se ambos os usuários excluíram a conversa e, se sim, apaga as mensagens
+     */
+    private static CompletableFuture<Boolean> verificarEExcluirMensagensSeNecessario(String chatId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        firestore.collection("chats").document(chatId)
+                .get()
+                .addOnSuccessListener(chatDoc -> {
+                    if (chatDoc.exists()) {
+                        List<String> usuariosExcluidos = (List<String>) chatDoc.get("usuariosExcluidos");
+                        String userId1 = chatDoc.getString("userId1");
+                        String userId2 = chatDoc.getString("userId2");
+                        
+                        // Se ambos os usuários excluíram, apagar mensagens
+                        if (usuariosExcluidos != null && usuariosExcluidos.contains(userId1) && usuariosExcluidos.contains(userId2)) {
+                            Log.d(TAG, "Ambos os usuários excluíram a conversa, apagando mensagens...");
+                            apagarMensagensConversa(chatId)
+                                    .thenAccept(sucesso -> {
+                                        Log.d(TAG, "Mensagens apagadas com sucesso: " + sucesso);
+                                        futuro.complete(sucesso);
+                                    })
+                                    .exceptionally(erro -> {
+                                        Log.e(TAG, "Erro ao apagar mensagens: " + erro.getMessage(), erro);
+                                        futuro.complete(false);
+                                        return null;
+                                    });
+                        } else {
+                            Log.d(TAG, "Apenas um usuário excluiu, mantendo mensagens");
+                            futuro.complete(true);
+                        }
+                    } else {
+                        Log.w(TAG, "Documento do chat não encontrado");
+                        futuro.complete(false);
+                    }
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar exclusão: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Apaga todas as mensagens de uma conversa
+     */
+    private static CompletableFuture<Boolean> apagarMensagensConversa(String chatId) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "Apagando mensagens da conversa: " + chatId);
+        
+        firestore.collection("chats").document(chatId).collection("messages")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<com.google.android.gms.tasks.Task<Void>> deleteTasks = new ArrayList<>();
+                    
+                    for (DocumentSnapshot messageDoc : querySnapshot.getDocuments()) {
+                        deleteTasks.add(messageDoc.getReference().delete());
+                    }
+                    
+                    com.google.android.gms.tasks.Tasks.whenAll(deleteTasks)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Todas as mensagens apagadas com sucesso");
+                                futuro.complete(true);
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao apagar mensagens: " + erro.getMessage(), erro);
+                                futuro.complete(false);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar mensagens para apagar: " + erro.getMessage(), erro);
+                    futuro.complete(false);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Verifica se uma reserva já foi avaliada pelo usuário
+     * 
+     * @param reservaId ID da reserva
+     * @param tipoAvaliacao "instrumento" ou "usuario"
+     * @return CompletableFuture<Boolean> true se já foi avaliada
+     */
+    public static CompletableFuture<Boolean> verificarSeReservaFoiAvaliada(String reservaId, String tipoAvaliacao) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        String collection = tipoAvaliacao.equals("usuario") ? "avaliacoes_usuarios" : "avaliacoes";
+        
+        firestore.collection(collection)
+                .whereEqualTo("reservaId", reservaId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    boolean jaAvaliada = !querySnapshot.isEmpty();
+                    Log.d(TAG, "Reserva " + reservaId + " já avaliada (" + tipoAvaliacao + "): " + jaAvaliada);
+                    futuro.complete(jaAvaliada);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao verificar se reserva foi avaliada: " + erro.getMessage(), erro);
+                    futuro.complete(false); // Em caso de erro, permitir avaliação
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Busca avaliações recebidas por um usuário (quando ele foi locatário)
+     * 
+     * @param usuarioId ID do usuário (como locatário)
+     * @return CompletableFuture<List<DocumentSnapshot>> Lista de avaliações recebidas como locatário
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> obterAvaliacoesRecebidas(String usuarioId) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        Log.d(TAG, "Buscando avaliações recebidas para usuário: " + usuarioId);
+        
+        firestore.collection("avaliacoes_usuarios")
+                .whereEqualTo("avaliadoId", usuarioId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> avaliacoes = querySnapshot.getDocuments();
+                    
+                    // Ordenar manualmente por data de avaliação (mais recente primeiro)
+                    avaliacoes.sort((doc1, doc2) -> {
+                        Timestamp data1 = doc1.getTimestamp("dataAvaliacao");
+                        Timestamp data2 = doc2.getTimestamp("dataAvaliacao");
+                        
+                        if (data1 == null && data2 == null) return 0;
+                        if (data1 == null) return 1;
+                        if (data2 == null) return -1;
+                        
+                        return data2.compareTo(data1); // DESCENDING
+                    });
+                    
+                    Log.d(TAG, "Encontradas " + avaliacoes.size() + " avaliações recebidas");
+                    futuro.complete(avaliacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar avaliações recebidas: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Busca avaliações de instrumentos feitas por um usuário
+     * 
+     * @param usuarioId ID do usuário
+     * @return CompletableFuture<List<DocumentSnapshot>> Lista de avaliações feitas
+     */
+    public static CompletableFuture<List<DocumentSnapshot>> obterAvaliacoesFeitas(String usuarioId) {
+        CompletableFuture<List<DocumentSnapshot>> futuro = new CompletableFuture<>();
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        Log.d(TAG, "Buscando avaliações feitas pelo usuário: " + usuarioId);
+        
+        firestore.collection("avaliacoes")
+                .whereEqualTo("locatarioId", usuarioId)
+                .orderBy("dataAvaliacao", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> avaliacoes = querySnapshot.getDocuments();
+                    Log.d(TAG, "Encontradas " + avaliacoes.size() + " avaliações feitas");
+                    futuro.complete(avaliacoes);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar avaliações feitas: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
                 });
         
         return futuro;

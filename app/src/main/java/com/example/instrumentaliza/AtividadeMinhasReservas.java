@@ -1,5 +1,6 @@
 package com.example.instrumentaliza;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -9,40 +10,47 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * AtividadeMinhasReservas - Tela de minhas reservas
  * 
- * Esta tela exibe todas as reservas feitas pelo usuário logado, permitindo
- * visualizar o histórico de aluguéis e gerenciar reservas ativas.
+ * Esta tela exibe todas as reservas ativas do usuário logado, incluindo
+ * reservas que foram aceitas através do sistema de solicitações.
  * 
  * Funcionalidades principais:
- * - Exibição de lista de reservas do usuário
- * - Diferenciação por status (Pendente, Confirmada, Cancelada, Concluída)
+ * - Exibição de lista de reservas ativas do usuário
+ * - Diferenciação por status (CONFIRMED, PENDING, CANCELLED)
  * - Formatação de datas e preços
  * - Estado vazio quando não há reservas
+ * - Integração com Firebase Firestore
  * - Navegação de volta para tela anterior
  * 
  * Características técnicas:
  * - RecyclerView com LinearLayoutManager
- * - ExecutorService para operações assíncronas
+ * - Firebase Firestore para dados
  * - Adaptador customizado para reservas
- * - GerenciadorSessao para dados do usuário
+ * - Firebase Auth para autenticação
  * - Tratamento de estados vazios
  * 
  * @author Jhonata
- * @version 1.0
+ * @version 2.0 - Atualizado para Firebase
  */
-public class AtividadeMinhasReservas extends AppCompatActivity {
+public class AtividadeMinhasReservas extends AppCompatActivity implements AdaptadorReservas.OnReservaClickListener {
     
     // Constantes
     private static final String TAG = "MinhasReservas";
@@ -52,14 +60,13 @@ public class AtividadeMinhasReservas extends AppCompatActivity {
     private static final String STATUS_CONCLUIDA = "COMPLETED";
 
     // Componentes da interface
-    private RecyclerView listaReservas;
-    private TextView textoEstadoVazio;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
+    private AdaptadorReservaTabs adaptadorReservaTabs;
     
-    // Gerenciamento de dados e threads
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private GerenciadorSessao gerenciadorSessao;
-    private AdaptadorReservas adaptadorReservas;
-    private List<DetalhesReserva> reservas;
+    // Firebase e dados
+    private FirebaseAuth autenticacao;
+    private FirebaseUser usuarioAtual;
 
     /**
      * Método chamado quando a atividade é criada
@@ -78,84 +85,67 @@ public class AtividadeMinhasReservas extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_reservations);
 
-        gerenciadorSessao = new GerenciadorSessao(this);
+        Log.d(TAG, "=== ATIVIDADE MINHAS RESERVAS INICIADA ===");
+
+        // Inicializar Firebase
+        GerenciadorFirebase.inicializar(this);
+        autenticacao = FirebaseAuth.getInstance();
+        usuarioAtual = autenticacao.getCurrentUser();
+
+        Log.d(TAG, "=== INICIALIZAÇÃO ===");
+        Log.d(TAG, "Autenticação inicializada: " + (autenticacao != null ? "SIM" : "NÃO"));
+        Log.d(TAG, "Usuário atual: " + (usuarioAtual != null ? usuarioAtual.getUid() : "NULL"));
+        Log.d(TAG, "Email do usuário: " + (usuarioAtual != null ? usuarioAtual.getEmail() : "NULL"));
+
+        // Verificar se o usuário está logado
+        if (usuarioAtual == null) {
+            Log.e(TAG, "Usuário não está logado - finalizando atividade");
+            finish();
+            return;
+        }
 
         // Configurar Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(getString(R.string.reservations_title));
         }
 
         // Inicializar views
-        listaReservas = findViewById(R.id.reservationsRecyclerView);
-        textoEstadoVazio = findViewById(R.id.emptyStateTextView);
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.viewPager);
 
-        // Configurar RecyclerView
-        reservas = new ArrayList<>();
-        adaptadorReservas = new AdaptadorReservas(reservas);
-        listaReservas.setLayoutManager(new LinearLayoutManager(this));
-        listaReservas.setAdapter(adaptadorReservas);
+        // Configurar ViewPager2 e TabLayout
+        adaptadorReservaTabs = new AdaptadorReservaTabs(this);
+        viewPager.setAdapter(adaptadorReservaTabs);
 
-        // Carregar reservas
-        carregarReservas();
-    }
-
-    private void carregarReservas() {
-        executorService.execute(() -> {
-            try {
-                List<Reserva> reservasUsuario = AppDatabase.getInstance(this)
-                        .reservaDao()
-                        .obterPorIdUsuario(gerenciadorSessao.getUserId());
-
-                List<DetalhesReserva> reservasWithDetails = new ArrayList<>();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-                for (Reserva reserva : reservasUsuario) {
-                    Instrumento instrumento = AppDatabase.getInstance(this)
-                            .instrumentoDao()
-                            .obterPorId(reserva.getIdInstrumento());
-
-                    if (instrumento != null) {
-                        DetalhesReserva details = new DetalhesReserva(
-                                reserva,
-                                instrumento.getNome(),
-                                dateFormat.format(reserva.getDataInicio()),
-                                dateFormat.format(reserva.getDataFim())
-                        );
-                        reservasWithDetails.add(details);
-                    }
-                }
-
-                runOnUiThread(() -> {
-                    reservas.clear();
-                    reservas.addAll(reservasWithDetails);
-                    if (reservas.isEmpty()) {
-                        mostrarEstadoVazio();
-                    } else {
-                        esconderEstadoVazio();
-                        adaptadorReservas.notifyDataSetChanged();
-                    }
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Erro ao carregar reservas: " + e.getMessage(), e);
-                runOnUiThread(() -> {
-                    Toast.makeText(this, getString(R.string.error_generic) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    mostrarEstadoVazio();
-                });
+        // Conectar TabLayout com ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("Meus Instrumentos");
+                    break;
+                case 1:
+                    tab.setText("Meus Interesses");
+                    break;
             }
-        });
+        }).attach();
     }
 
-    private void mostrarEstadoVazio() {
-        textoEstadoVazio.setVisibility(View.VISIBLE);
-        listaReservas.setVisibility(View.GONE);
-    }
-
-    private void esconderEstadoVazio() {
-        textoEstadoVazio.setVisibility(View.GONE);
-        listaReservas.setVisibility(View.VISIBLE);
+    /**
+     * Recarrega as abas de reservas
+     * 
+     * Método público para ser chamado pelos fragments quando necessário
+     */
+    public void recarregarAbas() {
+        Log.d(TAG, "Recarregando abas de reservas");
+        // Notificar fragments para recarregar dados
+        for (int i = 0; i < adaptadorReservaTabs.getItemCount(); i++) {
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + i);
+            if (fragment instanceof FragmentReservaTab) {
+                ((FragmentReservaTab) fragment).carregarReservas();
+            }
+        }
     }
 
     @Override
@@ -167,102 +157,30 @@ public class AtividadeMinhasReservas extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Implementa o listener para cliques em reservas
+     * 
+     * @param reserva Documento da reserva clicada
+     */
+    public void onReservaClick(DocumentSnapshot reserva) {
+        Log.d(TAG, "Reserva clicada: " + reserva.getId());
+        // TODO: Implementar navegação para detalhes da reserva
+        Toast.makeText(this, "Detalhes da reserva em breve!", Toast.LENGTH_SHORT).show();
+    }
+    
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        executorService.shutdown();
+    public void onAvaliarReserva(DocumentSnapshot reserva) {
+        Log.d(TAG, "Avaliando reserva: " + reserva.getId());
+        
+        // Abrir tela de avaliação
+        Intent intent = new Intent(this, AtividadeAvaliarAluguel.class);
+        intent.putExtra("reserva_id", reserva.getId());
+        intent.putExtra("instrumento_id", reserva.getString("instrumentId"));
+        intent.putExtra("instrumento_nome", "Instrumento"); // Será carregado na tela
+        intent.putExtra("proprietario_id", reserva.getString("ownerId"));
+        intent.putExtra("proprietario_nome", "Proprietário"); // Será carregado na tela
+        
+        startActivity(intent);
     }
 
-    private static class DetalhesReserva {
-        private final Reserva reserva;
-        private final String instrumentName;
-        private final String startDate;
-        private final String endDate;
-
-        public DetalhesReserva(Reserva reserva, String instrumentName, 
-                String startDate, String endDate) {
-            this.reserva = reserva;
-            this.instrumentName = instrumentName;
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        public Reserva getReservation() {
-            return reserva;
-        }
-
-        public String getInstrumentName() {
-            return instrumentName;
-        }
-
-        public String getStartDate() {
-            return startDate;
-        }
-
-        public String getEndDate() {
-            return endDate;
-        }
-    }
-
-    private class AdaptadorReservas extends RecyclerView.Adapter<AdaptadorReservas.ViewHolder> {
-        private final List<DetalhesReserva> reservas;
-
-        public AdaptadorReservas(List<DetalhesReserva> reservas) {
-            this.reservas = reservas;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.item_reservation, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            DetalhesReserva details = reservas.get(position);
-            Reserva reserva = details.getReservation();
-
-            holder.textoNomeInstrumento.setText(details.getInstrumentName());
-            holder.textoPeriodo.setText(String.format("%s - %s", 
-                    details.getStartDate(), details.getEndDate()));
-            holder.textoPrecoTotal.setText(String.format(Locale.getDefault(), 
-                    "Total: R$ %.2f", reserva.getPrecoTotal()));
-            holder.textoStatus.setText(obterTextoStatus(reserva.getStatus()));
-        }
-
-        @Override
-        public int getItemCount() {
-            return reservas.size();
-        }
-
-        private String obterTextoStatus(String status) {
-            switch (status) {
-                case STATUS_PENDENTE:
-                    return getString(R.string.status_pending);
-                case STATUS_CONFIRMADA:
-                    return getString(R.string.status_confirmed);
-                case STATUS_CANCELADA:
-                    return getString(R.string.status_cancelled);
-                case STATUS_CONCLUIDA:
-                    return getString(R.string.status_completed);
-                default:
-                    return status;
-            }
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            TextView textoNomeInstrumento;
-            TextView textoPeriodo;
-            TextView textoPrecoTotal;
-            TextView textoStatus;
-
-            ViewHolder(View itemView) {
-                super(itemView);
-                textoNomeInstrumento = itemView.findViewById(R.id.instrumentNameTextView);
-                textoPeriodo = itemView.findViewById(R.id.periodTextView);
-                textoPrecoTotal = itemView.findViewById(R.id.totalPriceTextView);
-                textoStatus = itemView.findViewById(R.id.statusTextView);
-            }
-        }
-    }
 } 

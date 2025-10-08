@@ -12,11 +12,17 @@
         android:title="@string/nav_instruments"
         android:icon="@drawable/ic_music" />
     
-    <!-- Meus Aluguéis -->
+    <!-- Aluguéis -->
     <item
         android:id="@+id/nav_my_rentals"
         android:title="@string/nav_my_rentals"
         android:icon="@drawable/ic_rentals" />
+    
+    <!-- Solicitações -->
+    <item
+        android:id="@+id/nav_requests"
+        android:title="@string/nav_requests"
+        android:icon="@drawable/ic_request" />
     
     <!-- Favoritos -->
     <item

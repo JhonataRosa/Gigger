@@ -48,7 +48,7 @@ public class AdaptadorTabsPerfil extends FragmentStateAdapter {
             case 0:
                 return new FragmentoDadosPerfil(); // Tab "Meus Dados"
             case 1:
-                return new FragmentoAvaliacoesPerfil(); // Tab "Minhas Avaliações"
+                return new FragmentAvaliacoesRecebidas(); // Tab "Minhas Avaliações"
             default:
                 return new FragmentoDadosPerfil();
         }

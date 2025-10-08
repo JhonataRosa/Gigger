@@ -3,49 +3,123 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardElevation="2dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/beige_light">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
+        <!-- Ícone do Instrumento -->
+        <ImageView
+            android:id="@+id/instrumentIconImageView"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_music_note"
+            android:background="@drawable/circle_background"
+            android:contentDescription="Ícone do instrumento"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Nome do Instrumento -->
         <TextView
             android:id="@+id/instrumentNameTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             android:textStyle="bold"
-            android:textColor="@color/text_instrument_name" />
+            android:textColor="@color/text_instrument_name"
+            android:textSize="16sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/instrumentIconImageView"
+            app:layout_constraintEnd_toStartOf="@id/statusTextView"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/periodTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:textColor="@color/text_gray_light" />
-
-        <TextView
-            android:id="@+id/totalPriceTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:textColor="@color/text_orange_dark" />
-
+        <!-- Badge de Status -->
         <TextView
             android:id="@+id/statusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:text="CONFIRMED"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:background="@drawable/status_background"
-            android:padding="4dp"
+            android:padding="6dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Período da Reserva -->
+        <TextView
+            android:id="@+id/periodTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_category_brown"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/instrumentIconImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/instrumentNameTextView" />
+
+        <!-- Preço Total -->
+        <TextView
+            android:id="@+id/totalPriceTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_price"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/instrumentIconImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/periodTextView" />
+
+        <!-- Data da Reserva -->
+        <TextView
+            android:id="@+id/reservationDateTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:textAppearance="?attr/textAppearanceCaption"
-            android:textColor="@color/text_price" />
+            android:textColor="@color/text_gray_light"
+            android:textSize="11sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/instrumentIconImageView"
+            app:layout_constraintEnd_toStartOf="@id/avaliarButton"
+            app:layout_constraintTop_toBottomOf="@id/totalPriceTextView" />
 
-    </LinearLayout>
+        <!-- Botão de Avaliar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/avaliarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:text="Avaliar"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/orange_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/totalPriceTextView" />
 
-</com.google.android.material.card.MaterialCardView> 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

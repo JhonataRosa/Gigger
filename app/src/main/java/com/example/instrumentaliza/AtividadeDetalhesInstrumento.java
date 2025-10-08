@@ -8,8 +8,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -61,6 +66,14 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
     // Componentes da interface - dados do proprietário
     private TextView textoNomeProprietario, textoEmailProprietario, textoTelefoneProprietario;
     
+    // Componentes da interface - avaliações
+    private LinearLayout secaoAvaliacoes;
+    private RatingBar ratingBarMedia;
+    private TextView textoNotaMedia, textoTotalAvaliacoes;
+    private RecyclerView listaAvaliacoes;
+    private TextView textoAvaliacoesVazias;
+    private AdaptadorAvaliacoes adaptadorAvaliacoes;
+    
     // Dados do instrumento
     private String idInstrumento;
     
@@ -105,6 +118,19 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
             textoNomeProprietario = findViewById(R.id.ownerNameTextView);
             textoEmailProprietario = findViewById(R.id.ownerEmailTextView);
             textoTelefoneProprietario = findViewById(R.id.ownerPhoneTextView);
+            
+            // Inicializar componentes da interface - avaliações
+            secaoAvaliacoes = findViewById(R.id.secaoAvaliacoes);
+            ratingBarMedia = findViewById(R.id.ratingBarMedia);
+            textoNotaMedia = findViewById(R.id.textoNotaMedia);
+            textoTotalAvaliacoes = findViewById(R.id.textoTotalAvaliacoes);
+            listaAvaliacoes = findViewById(R.id.listaAvaliacoes);
+            textoAvaliacoesVazias = findViewById(R.id.textoAvaliacoesVazias);
+            
+            // Configurar RecyclerView das avaliações
+            listaAvaliacoes.setLayoutManager(new LinearLayoutManager(this));
+            adaptadorAvaliacoes = new AdaptadorAvaliacoes(new java.util.ArrayList<>());
+            listaAvaliacoes.setAdapter(adaptadorAvaliacoes);
             
             // Verificar se os componentes críticos foram encontrados
             if (textoPreco == null) {
@@ -223,6 +249,9 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
                                         
                                         textoDescricao.setText((String) instrumentDoc.get("description"));
 
+                                        // Carregar avaliações do instrumento
+                                        carregarAvaliacoesInstrumento(idInstrumento);
+
                                         // Atualizar dados do proprietário
                                         if (ownerData != null) {
                                             String ownerName = (String) ownerData.get("name");
@@ -241,17 +270,17 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
                                         // Configurar botões de ação
                                         Button reserveButton = findViewById(R.id.reserveButton);
                                         Button sendMessageButton = findViewById(R.id.sendMessageButton);
-                                        Button manageAvailabilityButton = findViewById(R.id.manageAvailabilityButton);
+                                        Button requestsButton = findViewById(R.id.requestsButton);
                                         
                                         // Verificar se o usuário atual é o proprietário
                                         if (autenticacao.getCurrentUser() != null && autenticacao.getCurrentUser().getUid().equals(ownerId)) {
-                                            // Usuário é o proprietário - mostrar botão de gerenciar disponibilidade
+                                            // Usuário é o proprietário - mostrar botão de solicitações
                                             reserveButton.setVisibility(View.GONE);
                                             sendMessageButton.setVisibility(View.GONE);
-                                            manageAvailabilityButton.setVisibility(View.VISIBLE);
+                                            requestsButton.setVisibility(View.VISIBLE);
                                             
-                                            manageAvailabilityButton.setOnClickListener(v -> {
-                                                Intent intent = new Intent(AtividadeDetalhesInstrumento.this, AtividadeGerenciarDisponibilidade.class);
+                                            requestsButton.setOnClickListener(v -> {
+                                                Intent intent = new Intent(AtividadeDetalhesInstrumento.this, AtividadeListaSolicitacoes.class);
                                                 intent.putExtra("instrument_id", idInstrumento);
                                                 intent.putExtra("instrument_name", (String) instrumentDoc.get("name"));
                                                 startActivity(intent);
@@ -260,16 +289,18 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
                                             // Usuário não é o proprietário - mostrar botões de reserva e mensagem
                                             reserveButton.setVisibility(View.VISIBLE);
                                             sendMessageButton.setVisibility(View.VISIBLE);
-                                            manageAvailabilityButton.setVisibility(View.GONE);
+                                            requestsButton.setVisibility(View.GONE);
                                             
-                                            // Alterar texto do botão de reserva para "VER DISPONIBILIDADE"
-                                            reserveButton.setText(getString(R.string.view_availability));
+                                            // Configurar botão de reserva
+                                            reserveButton.setText("Reservar Instrumento");
                                             
                                             reserveButton.setOnClickListener(v -> {
-                                                // Abrir tela de visualização de disponibilidade
-                                                Intent intent = new Intent(AtividadeDetalhesInstrumento.this, AtividadeVisualizarDisponibilidadeInstrumento.class);
+                                                // Abrir tela de solicitação de reserva
+                                                Intent intent = new Intent(AtividadeDetalhesInstrumento.this, AtividadeSolicitarReserva.class);
                                                 intent.putExtra("instrument_id", idInstrumento);
                                                 intent.putExtra("instrument_name", (String) instrumentDoc.get("name"));
+                                                intent.putExtra("instrument_price", instrumentDoc.getDouble("price"));
+                                                intent.putExtra("owner_id", ownerId);
                                                 startActivity(intent);
                                             });
                                             
@@ -344,6 +375,62 @@ public class AtividadeDetalhesInstrumento extends AppCompatActivity {
                     Log.e(TAG, "Erro ao criar/obter chat: " + throwable.getMessage(), throwable);
                     runOnUiThread(() -> {
                         Toast.makeText(this, getString(R.string.error_generic) + ": " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                    return null;
+                });
+    }
+
+    /**
+     * Carrega as avaliações do instrumento
+     * 
+     * @param instrumentoId ID do instrumento
+     */
+    private void carregarAvaliacoesInstrumento(String instrumentoId) {
+        Log.d(TAG, "Carregando avaliações do instrumento: " + instrumentoId);
+        
+        GerenciadorFirebase.obterAvaliacoesInstrumento(instrumentoId)
+                .thenAccept(avaliacoes -> {
+                    runOnUiThread(() -> {
+                        if (avaliacoes.isEmpty()) {
+                            // Sem avaliações
+                            secaoAvaliacoes.setVisibility(View.VISIBLE);
+                            textoAvaliacoesVazias.setVisibility(View.VISIBLE);
+                            listaAvaliacoes.setVisibility(View.GONE);
+                            ratingBarMedia.setRating(0);
+                            textoNotaMedia.setText("0.0");
+                            textoTotalAvaliacoes.setText("(0 avaliações)");
+                        } else {
+                            // Com avaliações
+                            secaoAvaliacoes.setVisibility(View.VISIBLE);
+                            textoAvaliacoesVazias.setVisibility(View.GONE);
+                            listaAvaliacoes.setVisibility(View.VISIBLE);
+                            
+                            // Calcular nota média
+                            double somaNotas = 0;
+                            for (DocumentSnapshot avaliacao : avaliacoes) {
+                                Double nota = avaliacao.getDouble("nota");
+                                if (nota != null) {
+                                    somaNotas += nota;
+                                }
+                            }
+                            
+                            double notaMedia = somaNotas / avaliacoes.size();
+                            ratingBarMedia.setRating((float) notaMedia);
+                            textoNotaMedia.setText(String.format(Locale.getDefault(), "%.1f", notaMedia));
+                            textoTotalAvaliacoes.setText("(" + avaliacoes.size() + " avaliações)");
+                            
+                            // Atualizar adaptador
+                            adaptadorAvaliacoes.atualizarAvaliacoes(avaliacoes);
+                            
+                            Log.d(TAG, "Avaliações carregadas: " + avaliacoes.size() + " (nota média: " + notaMedia + ")");
+                        }
+                    });
+                })
+                .exceptionally(throwable -> {
+                    Log.e(TAG, "Erro ao carregar avaliações: " + throwable.getMessage(), throwable);
+                    runOnUiThread(() -> {
+                        // Em caso de erro, esconder seção de avaliações
+                        secaoAvaliacoes.setVisibility(View.GONE);
                     });
                     return null;
                 });

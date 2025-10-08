@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,7 @@ public class AtividadeLogin extends AppCompatActivity {
     private EditText campoEmail;
     private EditText campoSenha;
     private Button botaoLogin;
+    private TextView linkCriarConta;
     
     // Controle de estado
     private boolean estaFazendoLogin = false;
@@ -62,9 +64,12 @@ public class AtividadeLogin extends AppCompatActivity {
         campoEmail = findViewById(R.id.emailEditText);
         campoSenha = findViewById(R.id.passwordEditText);
         botaoLogin = findViewById(R.id.loginButton);
+        linkCriarConta = findViewById(R.id.registerLink);
 
         // Verificar se o usuário já está logado
         if (GerenciadorFirebase.usuarioEstaLogado()) {
+            // Reiniciar notificações para usuário já logado
+            InstrumentalizaApplication.getInstance().reiniciarNotificacoes();
             startActivity(new Intent(AtividadeLogin.this, AtividadeInstrumentos.class));
             finish();
             return;
@@ -72,6 +77,12 @@ public class AtividadeLogin extends AppCompatActivity {
 
         // Configurar listener do botão de login
         botaoLogin.setOnClickListener(v -> tentarLogin());
+        
+        // Configurar listener do link criar conta
+        linkCriarConta.setOnClickListener(v -> {
+            startActivity(new Intent(AtividadeLogin.this, AtividadeRegistrar.class));
+            finish();
+        });
     }
 
     /**
@@ -116,6 +127,12 @@ public class AtividadeLogin extends AppCompatActivity {
                         Log.d(TAG, "Login bem-sucedido: " + firebaseUser.getEmail());
                         Toast.makeText(this, getString(R.string.success_login), Toast.LENGTH_SHORT).show();
                         
+                        // Solicitar permissão de notificações se necessário
+                        UtilitarioPermissoes.solicitarPermissaoNotificacoes(AtividadeLogin.this);
+                        
+                        // Reiniciar notificações após login
+                        InstrumentalizaApplication.getInstance().reiniciarNotificacoes();
+                        
                         // Redirecionar para tela de instrumentos
                         Intent intent = new Intent(AtividadeLogin.this, AtividadeInstrumentos.class);
                         startActivity(intent);
@@ -140,7 +157,18 @@ public class AtividadeLogin extends AppCompatActivity {
                         estaFazendoLogin = false;
                         botaoLogin.setEnabled(true);
                     });
-                    return null;
-                });
+            return null;
+        });
     }
-} 
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        
+        if (UtilitarioPermissoes.verificarResultadoPermissao(requestCode, permissions, grantResults)) {
+            Toast.makeText(this, "Notificações habilitadas com sucesso!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Notificações podem não funcionar corretamente", Toast.LENGTH_LONG).show();
+        }
+    }
+}

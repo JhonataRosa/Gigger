@@ -4,25 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/nav_header_beige_light">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/beige_card"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="20dp"
         android:gravity="center_vertical">
 
-        <!-- Ícone de mensagem -->
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <!-- Avatar do chat -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:src="@drawable/ic_message"
-            android:background="@drawable/chat_icon_background"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/orange_primary"
+            android:background="@color/beige_light"
             android:padding="12dp"
-            android:contentDescription="Ícone de chat"
+            android:contentDescription="Avatar do chat"
             android:tint="@color/orange_primary" />
 
         <!-- Informações do chat -->
@@ -33,41 +36,64 @@
             android:orientation="vertical"
             android:layout_marginStart="16dp">
 
+            <!-- Nome do instrumento -->
             <TextView
                 android:id="@+id/instrumentNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Nome do Instrumento"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_instrument_name"
+                android:textColor="@color/text_black"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
+            <!-- Badge de papel -->
             <TextView
                 android:id="@+id/roleBadgeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
+                android:layout_marginTop="6dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
                 android:text="Seu anúncio"
                 android:textSize="12sp"
-                android:textColor="@color/orange_primary"
-                android:background="@drawable/price_background" />
+                android:textColor="@color/white"
+                android:background="@drawable/chat_badge_background"
+                android:textStyle="bold" />
 
+            <!-- Última mensagem -->
             <TextView
-                android:id="@+id/lastMessageTimeTextView"
+                android:id="@+id/lastMessageTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Última mensagem: 12:34"
+                android:layout_marginTop="8dp"
+                android:text="Última mensagem aqui..."
                 android:textSize="14sp"
+                android:textColor="@color/text_gray_light"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Horário da última mensagem -->
+            <TextView
+                android:id="@+id/lastMessageTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="12:34"
+                android:textSize="12sp"
                 android:textColor="@color/text_gray_light" />
 
         </LinearLayout>
+
+        <!-- Indicador de não lida (opcional) -->
+        <View
+            android:id="@+id/unreadIndicator"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/unread_indicator"
+            android:layout_marginEnd="12dp"
+            android:visibility="gone" />
 
         <!-- Seta indicativa -->
         <ImageView

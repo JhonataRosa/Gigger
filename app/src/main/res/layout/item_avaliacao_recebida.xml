@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header com avaliador e nota -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Nome do avaliador -->
+            <TextView
+                android:id="@+id/textoAvaliadorNome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nome do Avaliador"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textStyle="bold"
+                android:textColor="@color/text_black" />
+
+            <!-- Rating -->
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:isIndicator="true"
+                android:progressTint="@color/orange_primary" />
+
+        </LinearLayout>
+
+        <!-- Nome do instrumento -->
+        <TextView
+            android:id="@+id/textoInstrumentoNome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Instrumento: Guitarra"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="@color/text_gray_light"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Comentário -->
+        <TextView
+            android:id="@+id/textoComentario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comentário da avaliação..."
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="@color/text_black"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Data da avaliação -->
+        <TextView
+            android:id="@+id/textoDataAvaliacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="há 2 dias"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textColor="@color/text_gray_light" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

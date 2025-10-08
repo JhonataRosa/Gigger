@@ -3,7 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.instrumentaliza">
 
+    <!-- Permissões para notificações -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
+        android:name=".InstrumentalizaApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -62,11 +67,32 @@
             android:name=".AtividadeMinhasReservas"
             android:exported="false" />
         <activity 
-            android:name=".AtividadeGerenciarDisponibilidade"
-            android:exported="false" />
-        <activity 
             android:name=".AtividadeVisualizarDisponibilidadeInstrumento"
             android:exported="false" />
+        <activity
+            android:name=".AtividadeSolicitarReserva"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadeListaSolicitacoes"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadeDetalhesSolicitacao"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadeAvaliarAluguel"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadeAvaliarUsuario"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
+        <activity
+            android:name=".AtividadeMinhasAvaliacoes"
+            android:exported="false"
+            android:theme="@style/Theme.Instrumentaliza.NoActionBar" />
     </application>
 
 </manifest>

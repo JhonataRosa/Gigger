@@ -283,32 +283,120 @@
 
                     </LinearLayout>
 
-                    <!-- Botão para o proprietário gerenciar disponibilidade -->
+                    <!-- Seção de Avaliações -->
+                    <LinearLayout
+                        android:id="@+id/secaoAvaliacoes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/status_background"
+                        android:padding="16dp"
+                        android:visibility="gone">
+
+                        <!-- Título das Avaliações -->
+                        <TextView
+                            android:id="@+id/tituloAvaliacoes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Avaliações"
+                            android:textAppearance="?attr/textAppearanceHeadline6"
+                            android:textColor="@color/text_instrument_name"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp"
+                            android:drawableStart="@drawable/ic_star"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical" />
+
+                        <!-- Nota Média -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp">
+
+                            <RatingBar
+                                android:id="@+id/ratingBarMedia"
+                                style="?android:attr/ratingBarStyleSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:numStars="5"
+                                android:rating="0"
+                                android:stepSize="1"
+                                android:isIndicator="true"
+                                android:scaleX="0.8"
+                                android:scaleY="0.8" />
+
+                            <TextView
+                                android:id="@+id/textoNotaMedia"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0.0"
+                                android:textAppearance="?attr/textAppearanceBody1"
+                                android:textColor="@color/orange_primary"
+                                android:textStyle="bold"
+                                android:layout_marginStart="8dp" />
+
+                            <TextView
+                                android:id="@+id/textoTotalAvaliacoes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="(0 avaliações)"
+                                android:textAppearance="?attr/textAppearanceBody2"
+                                android:textColor="@color/text_gray_light"
+                                android:layout_marginStart="8dp" />
+
+                        </LinearLayout>
+
+                        <!-- Lista de Avaliações -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/listaAvaliacoes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:maxHeight="300dp" />
+
+                        <!-- Estado Vazio das Avaliações -->
+                        <TextView
+                            android:id="@+id/textoAvaliacoesVazias"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Este instrumento ainda não possui avaliações."
+                            android:textAppearance="?attr/textAppearanceBody2"
+                            android:textColor="@color/text_gray_light"
+                            android:textAlignment="center"
+                            android:padding="16dp"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <!-- Botão para o proprietário ver solicitações -->
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/manageAvailabilityButton"
+                        android:id="@+id/requestsButton"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:padding="16dp"
-                        android:text="Gerenciar Disponibilidade"
+                        android:text="Solicitações"
                         android:textAllCaps="false"
                         android:textSize="16sp"
                         android:visibility="gone"
                         app:strokeColor="@color/orange_primary"
                         android:textColor="@color/orange_primary"
-                        app:icon="@drawable/ic_calendar"
+                        app:icon="@drawable/ic_add"
                         app:iconGravity="textStart"
                         app:iconTint="@color/orange_primary" />
 
-                    <!-- Botão de Reservar/Ver Disponibilidade -->
+                    <!-- Botão de Reservar Instrumento -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/reserveButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:padding="16dp"
-                        android:text="Ver Disponibilidade"
+                        android:text="Reservar Instrumento"
                         android:textAllCaps="false"
                         android:textSize="16sp"
                         android:visibility="gone"

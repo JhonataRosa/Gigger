@@ -93,6 +93,10 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
     
     // Constantes
     private static final String TAG = "AtividadeInstrumentos";
+    
+    // Sistema de notificações
+    private MenuItem menuItemRequests;
+    private boolean hasUnreadRequests = false;
 
     /**
      * Normaliza uma string de categoria removendo acentos e convertendo para minúsculas
@@ -285,8 +289,11 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
                     return true;
                 } else if (id == R.id.nav_my_rentals) {
                     drawerLayout.closeDrawers();
-                    // TODO: Implementar tela de aluguéis
-                    Toast.makeText(this, getString(R.string.info_no_data), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, AtividadeMinhasReservas.class));
+                    return true;
+                } else if (id == R.id.nav_requests) {
+                    drawerLayout.closeDrawers();
+                    startActivity(new Intent(this, AtividadeListaSolicitacoes.class));
                     return true;
                 } else if (id == R.id.nav_favorites) {
                     drawerLayout.closeDrawers();
@@ -308,6 +315,8 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
                     return true;
                 } else if (id == R.id.nav_logout) {
                     drawerLayout.closeDrawers();
+                    // Parar notificações antes do logout
+                    InstrumentalizaApplication.getInstance().pararNotificacoes();
                     GerenciadorFirebase.sair();
                     startActivity(new Intent(this, AtividadePrincipal.class));
                     finish();
@@ -452,6 +461,8 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
         super.onResume();
         // Recarregar foto de perfil no header quando voltar de outras telas
         atualizarImagemPerfilHeader();
+        // Verificar solicitações não lidas sempre que a tela voltar ao foco
+        verificarSolicitacoesNaoLidas();
     }
 
     private void atualizarImagemPerfilHeader() {
@@ -745,6 +756,14 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_instruments, menu);
+        
+        // Configurar item de solicitações
+        menuItemRequests = menu.findItem(R.id.action_requests);
+        
+        // Adicionar botão de debug temporário
+        MenuItem debugItem = menu.add("Debug: Atualizar Notas");
+        debugItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        
         return true;
     }
 
@@ -756,13 +775,83 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             startActivity(intent);
             finish();
             return true;
-        } else if (item.getItemId() == R.id.action_logout) {
-            GerenciadorFirebase.sair();
-            startActivity(new Intent(this, AtividadePrincipal.class));
-            finish();
+        } else if (item.getItemId() == R.id.action_requests) {
+            // Abrir tela de solicitações (todas as solicitações do usuário)
+            Intent intent = new Intent(this, AtividadeListaSolicitacoes.class);
+            // Não passar dados de instrumento específico - mostrar todas as solicitações
+            startActivity(intent);
+            return true;
+        } else if (item.getTitle() != null && item.getTitle().toString().equals("Debug: Atualizar Notas")) {
+            // Botão de debug - atualizar todas as notas médias
+            Toast.makeText(this, "Atualizando todas as notas médias...", Toast.LENGTH_SHORT).show();
+            
+            GerenciadorFirebase.atualizarTodasAsNotasMedias()
+                    .thenAccept(v -> {
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, "Notas médias atualizadas com sucesso!", Toast.LENGTH_SHORT).show();
+                            // Recarregar a lista de instrumentos
+                            carregarInstrumentos();
+                        });
+                    })
+                    .exceptionally(erro -> {
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, "Erro ao atualizar notas: " + erro.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+                        return null;
+                    });
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    /**
+     * Verifica se há solicitações não lidas e atualiza o ícone
+     */
+    private void verificarSolicitacoesNaoLidas() {
+        FirebaseUser usuarioAtual = autenticacao.getCurrentUser();
+        if (usuarioAtual == null) {
+            Log.w(TAG, "Usuário não está logado");
+            return;
+        }
+        String userId = usuarioAtual.getUid();
+        
+        GerenciadorFirebase.buscarSolicitacoesProprietario(userId)
+                .thenAccept(solicitacoes -> {
+                    runOnUiThread(() -> {
+                        boolean hasUnread = false;
+                        
+                        for (DocumentSnapshot solicitacao : solicitacoes) {
+                            Boolean lida = solicitacao.getBoolean("lida");
+                            if (lida == null || !lida) {
+                                hasUnread = true;
+                                break;
+                            }
+                        }
+                        
+                        atualizarIconeNotificacao(hasUnread);
+                    });
+                })
+                .exceptionally(erro -> {
+                    Log.e(TAG, "Erro ao verificar solicitações não lidas: " + erro.getMessage(), erro);
+                    return null;
+                });
+    }
+    
+    /**
+     * Atualiza o ícone de notificação com badge se houver solicitações não lidas
+     */
+    private void atualizarIconeNotificacao(boolean hasUnread) {
+        hasUnreadRequests = hasUnread;
+        
+        if (menuItemRequests != null) {
+            if (hasUnread) {
+                // Mostrar ícone com badge de notificação
+                menuItemRequests.setIcon(R.drawable.ic_notification_badge);
+            } else {
+                // Mostrar ícone normal
+                menuItemRequests.setIcon(R.drawable.ic_request);
+            }
+        }
     }
 
     /**

@@ -12,8 +12,24 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/orange_primary"
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
+
+        <!-- Botão de exclusão da conversa -->
+        <ImageButton
+            android:id="@+id/deleteChatButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_delete"
+            android:background="@drawable/delete_button_background"
+            android:padding="12dp"
+            android:contentDescription="Excluir conversa"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="4dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

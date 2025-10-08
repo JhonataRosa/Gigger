@@ -51,6 +51,7 @@ public class AtividadeMeusInstrumentos extends AppCompatActivity implements Adap
     // Componentes da interface
     private RecyclerView listaMeusInstrumentos;
     private AdaptadorMeusInstrumentos adaptadorMeusInstrumentos;
+    private GerenciadorNotificacoes gerenciadorNotificacoes;
     
     // Autenticação
     private FirebaseAuth autenticacao;
@@ -75,6 +76,9 @@ public class AtividadeMeusInstrumentos extends AppCompatActivity implements Adap
         // Inicializar Firebase
         GerenciadorFirebase.inicializar(this);
         autenticacao = FirebaseAuth.getInstance();
+        
+        // Inicializar gerenciador de notificações
+        gerenciadorNotificacoes = new GerenciadorNotificacoes(this);
 
         // Configurar Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -193,9 +197,55 @@ public class AtividadeMeusInstrumentos extends AppCompatActivity implements Adap
                 });
     }
 
+
+    /**
+     * Manipula o clique no botão "Solicitações"
+     * 
+     * Abre a tela de lista de solicitações de reserva para o instrumento selecionado,
+     * permitindo ao proprietário ver e gerenciar as solicitações recebidas.
+     * 
+     * @param instrumento Documento do instrumento no Firestore
+     */
+    @Override
+    public void onRequestsClick(DocumentSnapshot instrumento) {
+        Log.d(TAG, "Abrindo solicitações para: " + instrumento.getId());
+        
+        Intent intent = new Intent(this, AtividadeListaSolicitacoes.class);
+        intent.putExtra("instrument_id", instrumento.getId());
+        intent.putExtra("instrument_name", instrumento.getString("name"));
+        startActivity(intent);
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Iniciar listener de notificações quando a tela está ativa
+        if (gerenciadorNotificacoes != null) {
+            gerenciadorNotificacoes.iniciarListenerSolicitacoes();
+        }
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Parar listener de notificações quando a tela não está ativa
+        if (gerenciadorNotificacoes != null) {
+            gerenciadorNotificacoes.pararListenerSolicitacoes();
+        }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Limpar recursos do gerenciador de notificações
+        if (gerenciadorNotificacoes != null) {
+            gerenciadorNotificacoes.pararListenerSolicitacoes();
+        }
     }
 }

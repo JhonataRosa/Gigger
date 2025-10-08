@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==================== USUÁRIOS ====================
+    match /users/{userId} {
+      // Usuário pode ler e editar apenas seu próprio perfil
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Usuários logados podem ler perfis de outros usuários
+      allow read: if request.auth != null;
+    }
+    
+    // ==================== INSTRUMENTOS ====================
+    match /instruments/{instrumentId} {
+      // Qualquer usuário logado pode ler instrumentos disponíveis
+      allow read: if request.auth != null;
+      
+      // Usuário logado pode criar instrumentos
+      allow create: if request.auth != null;
+      
+      // Apenas o dono pode editar ou deletar seu instrumento
+      allow update, delete: if request.auth != null && 
+                              request.auth.uid == resource.data.ownerId;
+    }
+    
+    // ==================== FAVORITOS ====================
+    match /favorites/{favoriteId} {
+      // Usuário logado pode ler seus próprios favoritos
+      allow read: if request.auth != null && 
+                    request.auth.uid == resource.data.userId;
+      
+      // Usuário logado pode criar favoritos
+      allow create: if request.auth != null && 
+                      request.auth.uid == request.resource.data.userId;
+      
+      // Usuário logado pode deletar seus próprios favoritos
+      allow delete: if request.auth != null && 
+                      request.auth.uid == resource.data.userId;
+    }
+    
+    // ==================== RESERVAS ====================
+    match /reservations/{reservationId} {
+      // Usuário logado pode ler suas próprias reservas
+      allow read: if request.auth != null && 
+                    (request.auth.uid == resource.data.userId || 
+                     request.auth.uid == resource.data.ownerId);
+      
+      // Usuário logado pode criar reservas
+      allow create: if request.auth != null;
+      
+      // Apenas o usuário da reserva ou o dono do instrumento pode editar
+      allow update: if request.auth != null && 
+                      (request.auth.uid == resource.data.userId || 
+                       request.auth.uid == resource.data.ownerId);
+    }
+    
+    // ==================== SOLICITAÇÕES DE RESERVA ====================
+    match /solicitacoes/{solicitacaoId} {
+      // Solicitante e proprietário podem ler a solicitação
+      allow read: if request.auth != null && 
+                    (request.auth.uid == resource.data.solicitanteId || 
+                     request.auth.uid == resource.data.proprietarioId);
+      
+      // Usuário logado pode criar solicitações
+      allow create: if request.auth != null && 
+                      request.auth.uid == request.resource.data.solicitanteId;
+      
+      // Apenas o proprietário pode atualizar (aceitar/recusar) a solicitação
+      allow update: if request.auth != null && 
+                      request.auth.uid == resource.data.proprietarioId;
+    }
+    
+    // ==================== CHATS - REGRAS TEMPORÁRIAS ====================
+    match /chats/{chatId} {
+      // TEMPORÁRIO: Usuário logado pode fazer tudo com chats
+      allow read, write: if request.auth != null;
+    }
+    
+    // ==================== MENSAGENS - REGRAS TEMPORÁRIAS ====================
+    match /messages/{messageId} {
+      // TEMPORÁRIO: Usuário logado pode fazer tudo com mensagens
+      allow read, write: if request.auth != null;
+    }
+    
+    // ==================== AVALIAÇÕES ====================
+    match /avaliacoes/{avaliacaoId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+                    request.auth.uid == request.resource.data.locatarioId;
+      allow update, delete: if request.auth != null && 
+                            request.auth.uid == resource.data.locatarioId;
+    }
+    
+    // ==================== AVALIAÇÕES DE USUÁRIOS ====================
+    match /avaliacoes_usuarios/{avaliacaoId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+                    request.auth.uid == request.resource.data.avaliadorId;
+      allow update, delete: if request.auth != null && 
+                            request.auth.uid == resource.data.avaliadorId;
+    }
+    
+  }
+}

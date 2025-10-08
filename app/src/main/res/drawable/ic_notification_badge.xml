@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Ícone principal -->
+    <item android:drawable="@drawable/ic_request" />
+    
+    <!-- Badge de notificação -->
+    <item
+        android:gravity="top|end"
+        android:top="2dp"
+        android:right="2dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/status_rejected" />
+            <size
+                android:width="14dp"
+                android:height="14dp" />
+        </shape>
+    </item>
+    
+</layer-list>
+

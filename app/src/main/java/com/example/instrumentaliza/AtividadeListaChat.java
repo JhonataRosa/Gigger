@@ -8,8 +8,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -48,12 +52,13 @@ public class AtividadeListaChat extends AppCompatActivity implements AdaptadorLi
     private static final String TAG = "ListaChat";
 
     // Componentes da interface
-    private RecyclerView listaChats;
-    private View layoutEstadoVazio;
-    private AdaptadorListaChat adaptadorListaChat;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
+    private AdaptadorChatTabs adaptadorTabs;
     
     // Autenticação
     private FirebaseAuth autenticacao;
+    private FirebaseUser usuarioAtual;
     private String idUsuarioAtual;
 
     /**
@@ -75,6 +80,7 @@ public class AtividadeListaChat extends AppCompatActivity implements AdaptadorLi
 
         GerenciadorFirebase.inicializar(this);
         autenticacao = FirebaseAuth.getInstance();
+        usuarioAtual = autenticacao.getCurrentUser();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,10 +89,8 @@ public class AtividadeListaChat extends AppCompatActivity implements AdaptadorLi
             getSupportActionBar().setTitle(getString(R.string.messages_title));
         }
 
-        listaChats = findViewById(R.id.chatsRecyclerView);
-        layoutEstadoVazio = findViewById(R.id.emptyStateLayout);
-
-        listaChats.setLayoutManager(new LinearLayoutManager(this));
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
 
         FirebaseUser user = autenticacao.getCurrentUser();
         if (user == null) {
@@ -96,50 +100,105 @@ public class AtividadeListaChat extends AppCompatActivity implements AdaptadorLi
         }
         idUsuarioAtual = user.getUid();
 
-        adaptadorListaChat = new AdaptadorListaChat(new ArrayList<>(), this, idUsuarioAtual);
-        listaChats.setAdapter(adaptadorListaChat);
-
-        carregarChatsUsuario();
+        // Configurar ViewPager2 e TabLayout
+        adaptadorTabs = new AdaptadorChatTabs(this);
+        viewPager.setAdapter(adaptadorTabs);
+        
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("Meus Anúncios");
+                    break;
+                case 1:
+                    tab.setText("Meus Interesses");
+                    break;
+            }
+        }).attach();
     }
 
-    private void carregarChatsUsuario() {
-        Log.d(TAG, "Carregando chats do usuário: " + idUsuarioAtual);
-
-        GerenciadorFirebase.obterChatsUsuario(idUsuarioAtual)
-                .thenAccept(chats -> runOnUiThread(() -> {
-                    if (chats.isEmpty()) {
-                        mostrarEstadoVazio();
-                    } else {
-                        esconderEstadoVazio();
-                        adaptadorListaChat.atualizarChats(chats);
-                    }
-                }))
-                .exceptionally(throwable -> {
-                    Log.e(TAG, "Erro ao carregar chats: " + throwable.getMessage(), throwable);
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, getString(R.string.error_generic), Toast.LENGTH_LONG).show();
-                        mostrarEstadoVazio();
-                    });
-                    return null;
-                });
-    }
-
-    private void mostrarEstadoVazio() {
-        layoutEstadoVazio.setVisibility(View.VISIBLE);
-    }
-
-    private void esconderEstadoVazio() {
-        layoutEstadoVazio.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onChatClick(DocumentSnapshot chat) {
+    /**
+     * Navega para o chat selecionado
+     */
+    public void navegarParaChat(DocumentSnapshot chat) {
         String chatId = chat.getId();
         String instrumentId = chat.getString("instrumentId");
         Intent intent = new Intent(this, AtividadeChat.class);
         intent.putExtra("chat_id", chatId);
         intent.putExtra("instrument_id", instrumentId);
         startActivity(intent);
+    }
+    
+    /**
+     * Exclui um chat
+     */
+    public void excluirChat(DocumentSnapshot chat) {
+        Log.d(TAG, "Exclusão solicitada para chat: " + chat.getId());
+        
+        // Mostrar dialog de confirmação
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Excluir Conversa")
+                .setMessage("Tem certeza que deseja excluir esta conversa?\n\nAs mensagens só serão apagadas definitivamente se ambos os usuários excluírem a conversa.")
+                .setPositiveButton("Excluir", (dialog, which) -> {
+                    excluirConversa(chat);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+    
+    /**
+     * Exclui uma conversa do ponto de vista do usuário atual
+     */
+    private void excluirConversa(DocumentSnapshot chat) {
+        String chatId = chat.getId();
+        String userId = usuarioAtual.getUid();
+        
+        Log.d(TAG, "Excluindo conversa " + chatId + " para usuário " + userId);
+        
+        // Marcar como excluída para este usuário
+        GerenciadorFirebase.marcarConversaComoExcluida(chatId, userId)
+                .thenAccept(sucesso -> {
+                    runOnUiThread(() -> {
+                        if (sucesso) {
+                            Toast.makeText(this, "Conversa excluída com sucesso", Toast.LENGTH_SHORT).show();
+                            // Recarregar as abas
+                            recarregarAbas();
+                        } else {
+                            Toast.makeText(this, "Erro ao excluir conversa", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .exceptionally(erro -> {
+                    Log.e(TAG, "Erro ao excluir conversa: " + erro.getMessage(), erro);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Erro ao excluir conversa: " + erro.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                    return null;
+                });
+    }
+    
+    /**
+     * Recarrega as abas após exclusão
+     */
+    private void recarregarAbas() {
+        // Notificar os fragments para recarregar
+        if (adaptadorTabs != null) {
+            for (int i = 0; i < adaptadorTabs.getItemCount(); i++) {
+                Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + i);
+                if (fragment instanceof FragmentChatTab) {
+                    ((FragmentChatTab) fragment).carregarChats();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onChatClick(DocumentSnapshot chat) {
+        navegarParaChat(chat);
+    }
+    
+    @Override
+    public void onChatDelete(DocumentSnapshot chat) {
+        excluirChat(chat);
     }
 
     @Override

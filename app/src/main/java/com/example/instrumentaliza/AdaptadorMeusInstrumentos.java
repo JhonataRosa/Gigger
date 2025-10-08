@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.google.android.material.button.MaterialButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +31,7 @@ public class AdaptadorMeusInstrumentos extends RecyclerView.Adapter<AdaptadorMeu
         void onInstrumentClick(DocumentSnapshot instrumento);
         void onEditClick(DocumentSnapshot instrumento);
         void onDeleteClick(DocumentSnapshot instrumento);
+        void onRequestsClick(DocumentSnapshot instrumento);
     }
 
     public AdaptadorMeusInstrumentos(List<DocumentSnapshot> instrumentos, OnMyInstrumentClickListener listener) {
@@ -71,6 +73,9 @@ public class AdaptadorMeusInstrumentos extends RecyclerView.Adapter<AdaptadorMeu
         // Configurar listener para clicar no item
         holder.itemView.setOnClickListener(v -> listener.onInstrumentClick(documentoInstrumento));
         
+        // Configurar listener para o botão de solicitações
+        holder.botaoSolicitacoes.setOnClickListener(v -> listener.onRequestsClick(documentoInstrumento));
+        
         // Configurar listener para o botão de editar
         holder.botaoEditar.setOnClickListener(v -> listener.onEditClick(documentoInstrumento));
         
@@ -98,6 +103,7 @@ public class AdaptadorMeusInstrumentos extends RecyclerView.Adapter<AdaptadorMeu
         TextView textoCategoria;
         TextView textoDescricao;
         TextView textoPreco;
+        MaterialButton botaoSolicitacoes;
         ImageButton botaoEditar;
         ImageButton botaoDeletar;
 
@@ -108,6 +114,7 @@ public class AdaptadorMeusInstrumentos extends RecyclerView.Adapter<AdaptadorMeu
             textoCategoria = itemView.findViewById(R.id.categoryTextView);
             textoDescricao = itemView.findViewById(R.id.descriptionTextView);
             textoPreco = itemView.findViewById(R.id.priceTextView);
+            botaoSolicitacoes = itemView.findViewById(R.id.requestsButton);
             botaoEditar = itemView.findViewById(R.id.editButton);
             botaoDeletar = itemView.findViewById(R.id.deleteButton);
         }

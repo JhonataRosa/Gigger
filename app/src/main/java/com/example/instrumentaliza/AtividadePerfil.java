@@ -252,6 +252,8 @@ public class AtividadePerfil extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (item.getItemId() == R.id.action_logout) {
+            // Parar notificações antes do logout
+            InstrumentalizaApplication.getInstance().pararNotificacoes();
             // Fazer logout e retornar à tela inicial
             GerenciadorFirebase.sair();
             startActivity(new Intent(this, AtividadePrincipal.class));

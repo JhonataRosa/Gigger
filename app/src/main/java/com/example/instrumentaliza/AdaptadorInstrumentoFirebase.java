@@ -47,6 +47,9 @@ import java.util.Locale;
  */
 public class AdaptadorInstrumentoFirebase extends RecyclerView.Adapter<AdaptadorInstrumentoFirebase.ViewHolder> {
     
+    // Constantes
+    private static final String TAG = "AdaptadorInstrumentoFirebase";
+    
     // Dados do adaptador
     private List<DocumentSnapshot> instrumentos;
     private final String idUsuarioAtual;
@@ -153,7 +156,23 @@ public class AdaptadorInstrumentoFirebase extends RecyclerView.Adapter<Adaptador
         holder.textoNome.setText(instrumento.getName());
         holder.textoCategoria.setText(instrumento.getCategory());
         holder.textoDescricao.setText(instrumento.getDescription());
-        holder.textoPreco.setText(String.format(Locale.getDefault(), "R$ %.2f/dia", instrumento.getPrice()));
+        
+        // Configurar preço com nota
+        Log.d(TAG, "Instrumento: " + instrumento.getName() + 
+                   " - Nota média: " + instrumento.getNotaMedia() + 
+                   " - Total avaliações: " + instrumento.getTotalAvaliacoes() +
+                   " - Possui avaliações: " + instrumento.possuiAvaliacoes());
+        
+        String textoPreco;
+        if (instrumento.possuiAvaliacoes()) {
+            textoPreco = String.format(Locale.getDefault(), "R$ %.2f/dia\n%.1f (%d avaliações)", 
+                instrumento.getPrice(), 
+                instrumento.getNotaMedia(),
+                instrumento.getTotalAvaliacoes());
+        } else {
+            textoPreco = String.format(Locale.getDefault(), "R$ %.2f/dia\nSem avaliações", instrumento.getPrice());
+        }
+        holder.textoPreco.setText(textoPreco);
 
         // Verificar se o instrumento está nos favoritos do usuário
         GerenciadorFirebase.ehFavorito(idUsuarioAtual, documentoInstrumento.getId())
