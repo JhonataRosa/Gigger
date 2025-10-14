@@ -18,6 +18,7 @@
 
         <!-- Avatar do chat -->
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/instrumentImageView"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:src="@drawable/ic_message"
@@ -25,7 +26,7 @@
             app:civ_border_color="@color/orange_primary"
             android:background="@color/beige_light"
             android:padding="12dp"
-            android:contentDescription="Avatar do chat"
+            android:contentDescription="Foto do instrumento"
             android:tint="@color/orange_primary" />
 
         <!-- Informações do chat -->
@@ -41,7 +42,7 @@
                 android:id="@+id/instrumentNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nome do Instrumento"
+                android:text="@string/instrument_name_placeholder"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_black"
@@ -56,7 +57,7 @@
                 android:layout_marginTop="6dp"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
-                android:text="Seu anúncio"
+                android:text="@string/your_ad"
                 android:textSize="12sp"
                 android:textColor="@color/white"
                 android:background="@drawable/chat_badge_background"

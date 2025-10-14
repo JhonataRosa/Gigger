@@ -85,7 +85,8 @@
             app:cornerRadius="28dp"
             app:icon="@drawable/ic_login"
             app:iconGravity="textStart"
-            app:iconPadding="8dp" />
+            app:iconPadding="8dp"
+            app:iconTint="@color/orange_primary" />
 
         <!-- Botão Cadastrar -->
         <com.google.android.material.button.MaterialButton
@@ -100,7 +101,8 @@
             app:cornerRadius="28dp"
             app:icon="@drawable/ic_person_add"
             app:iconGravity="textStart"
-            app:iconPadding="8dp" />
+            app:iconPadding="8dp"
+            app:iconTint="@color/orange_primary" />
 
     </LinearLayout>
 

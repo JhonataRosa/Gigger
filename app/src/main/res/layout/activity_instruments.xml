@@ -143,7 +143,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Todos"
+                        android:text="@string/all_instruments"
                         android:textColor="@color/text_category_brown"
                         android:textSize="16sp"
                         android:layout_marginTop="4dp" />
@@ -167,10 +167,9 @@
                     android:foreground="?attr/selectableItemBackground"
                     android:clipToOutline="true">
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_cordas"
-                        android:tint="@color/text_category_brown" />
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/icone_violao" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -229,10 +228,9 @@
                     android:foreground="?attr/selectableItemBackground"
                     android:clipToOutline="true">
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_percussao"
-                        android:tint="@color/text_category_brown" />
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/icone_tambor" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -260,10 +258,9 @@
                     android:foreground="?attr/selectableItemBackground"
                     android:clipToOutline="true">
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_sopro"
-                        android:tint="@color/text_category_brown" />
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/icone_sax" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -323,7 +320,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="MENOR PREÇO"
+                    android:text="@string/lower_price"
                     android:textSize="14sp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -331,7 +328,7 @@
                     style="@style/SortButtonUnselected"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MAIOR PREÇO"
+                    android:text="@string/higher_price"
                     android:textSize="14sp" />
 
             </LinearLayout>

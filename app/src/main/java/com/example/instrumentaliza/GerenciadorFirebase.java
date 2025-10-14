@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -616,6 +617,58 @@ public class GerenciadorFirebase {
         return futuro;
     }
     
+    /**
+     * Atualiza um instrumento com os dados específicos fornecidos
+     * 
+     * @param idInstrumento ID do instrumento a ser atualizado
+     * @param nome Novo nome do instrumento
+     * @param categoria Nova categoria do instrumento
+     * @param preco Novo preço do instrumento
+     * @param descricao Nova descrição do instrumento
+     * @param urlImagem Nova URL da imagem do instrumento
+     * @return CompletableFuture<Boolean> indicando sucesso da operação
+     */
+    public static CompletableFuture<Boolean> atualizarInstrumento(String idInstrumento, String nome, String categoria, 
+                                                                 double preco, String descricao, String urlImagem) {
+        CompletableFuture<Boolean> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "=== ATUALIZANDO INSTRUMENTO ===");
+        Log.d(TAG, "ID: " + idInstrumento);
+        Log.d(TAG, "Nome: " + nome);
+        Log.d(TAG, "Categoria: " + categoria);
+        Log.d(TAG, "Preço: " + preco);
+        Log.d(TAG, "Descrição: " + descricao);
+        Log.d(TAG, "URL Imagem: " + urlImagem);
+        
+        // Garantir que firestore está inicializado
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+            Log.d(TAG, "Firestore inicializado em atualizarInstrumento");
+        }
+        
+        Map<String, Object> atualizacoes = new HashMap<>();
+        atualizacoes.put("name", nome);
+        atualizacoes.put("category", categoria);
+        atualizacoes.put("price", preco);
+        atualizacoes.put("description", descricao);
+        atualizacoes.put("imageUri", urlImagem);
+        atualizacoes.put("updatedAt", Timestamp.now());
+        
+        firestore.collection(COLECAO_INSTRUMENTOS)
+                .document(idInstrumento)
+                .update(atualizacoes)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Instrumento atualizado com sucesso");
+                    futuro.complete(true);
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao atualizar instrumento: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
     public static CompletableFuture<Boolean> deletarInstrumento(String idInstrumento) {
         CompletableFuture<Boolean> futuro = new CompletableFuture<>();
         
@@ -653,7 +706,7 @@ public class GerenciadorFirebase {
         dadosReserva.put("startDate", dataInicio);
         dadosReserva.put("endDate", dataFim);
         dadosReserva.put("totalPrice", precoTotal);
-        dadosReserva.put("status", "PENDING");
+        dadosReserva.put("status", "PENDENTE");
         dadosReserva.put("createdAt", new Date());
         
         firestore.collection(COLECAO_RESERVAS)
@@ -697,7 +750,7 @@ public class GerenciadorFirebase {
         
         firestore.collection(COLECAO_RESERVAS)
                 .whereEqualTo("idInstrumento", idInstrumento)
-                .whereNotIn("status", List.of("CANCELLED"))
+                .whereNotIn("status", List.of("CANCELADA"))
                 .get()
                 .addOnSuccessListener(snapshotConsulta -> {
                     List<DocumentSnapshot> reservas = snapshotConsulta.getDocuments();
@@ -752,6 +805,54 @@ public class GerenciadorFirebase {
                 })
                 .addOnFailureListener(erro -> {
                     Log.e(TAG, "Erro ao enviar imagem do instrumento: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
+     * Faz upload de uma nova imagem para um instrumento existente
+     * 
+     * @param uriImagem URI da nova imagem selecionada
+     * @param idInstrumento ID do instrumento que está sendo editado
+     * @return CompletableFuture<String> com a URL da nova imagem
+     */
+    public static CompletableFuture<String> fazerUploadImagemInstrumento(Uri uriImagem, String idInstrumento) {
+        CompletableFuture<String> futuro = new CompletableFuture<>();
+        
+        Log.d(TAG, "fazerUploadImagemInstrumento chamado - URI: " + uriImagem + ", ID Instrumento: " + idInstrumento);
+        
+        // Garantir que armazenamento está inicializado
+        if (armazenamento == null) {
+            armazenamento = FirebaseStorage.getInstance();
+            Log.d(TAG, "FirebaseStorage inicializado em fazerUploadImagemInstrumento");
+        }
+        
+        // Gerar nome único para a nova imagem
+        String nomeArquivo = "instrumento_" + idInstrumento + "_" + System.currentTimeMillis() + ".jpg";
+        Log.d(TAG, "Nome do arquivo gerado: " + nomeArquivo);
+        
+        Log.d(TAG, "Criando referência para: " + ARMAZENAMENTO_INSTRUMENTOS + "/" + nomeArquivo);
+        StorageReference referenciaArmazenamento = armazenamento.getReference().child(ARMAZENAMENTO_INSTRUMENTOS + "/" + nomeArquivo);
+        
+        Log.d(TAG, "Iniciando upload da nova imagem...");
+        referenciaArmazenamento.putFile(uriImagem)
+                .addOnSuccessListener(snapshotTarefa -> {
+                    Log.d(TAG, "Upload da nova imagem concluído com sucesso, obtendo URL de download...");
+                    referenciaArmazenamento.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                String urlDownload = uri.toString();
+                                Log.d(TAG, "Nova imagem do instrumento enviada: " + urlDownload);
+                                futuro.complete(urlDownload);
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao obter URL da nova imagem: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao enviar nova imagem do instrumento: " + erro.getMessage(), erro);
                     futuro.completeExceptionally(erro);
                 });
         
@@ -1821,6 +1922,59 @@ public class GerenciadorFirebase {
     }
     
     /**
+     * Marca TODAS as solicitações de um proprietário como lidas
+     * Útil para limpar o badge de notificação
+     */
+    public static CompletableFuture<Integer> marcarTodasSolicitacoesComoLidas(String proprietarioId) {
+        CompletableFuture<Integer> futuro = new CompletableFuture<>();
+        
+        
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        
+        // Buscar todas as solicitações não lidas do proprietário
+        firestore.collection("solicitacoes")
+                .whereEqualTo("proprietarioId", proprietarioId)
+                .whereEqualTo("lida", false)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<DocumentSnapshot> solicitacoesNaoLidas = querySnapshot.getDocuments();
+                    
+                    if (solicitacoesNaoLidas.isEmpty()) {
+                        futuro.complete(0);
+                        return;
+                    }
+                    
+                    // Usar lote para atualizar todas de uma vez
+                    WriteBatch batch = firestore.batch();
+                    
+                    for (DocumentSnapshot solicitacao : solicitacoesNaoLidas) {
+                        Map<String, Object> atualizacoes = new HashMap<>();
+                        atualizacoes.put("lida", true);
+                        atualizacoes.put("dataLeitura", Timestamp.now());
+                        
+                        batch.update(solicitacao.getReference(), atualizacoes);
+                    }
+                    
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                futuro.complete(solicitacoesNaoLidas.size());
+                            })
+                            .addOnFailureListener(erro -> {
+                                Log.e(TAG, "Erro ao marcar todas as solicitações como lidas: " + erro.getMessage(), erro);
+                                futuro.completeExceptionally(erro);
+                            });
+                })
+                .addOnFailureListener(erro -> {
+                    Log.e(TAG, "Erro ao buscar solicitações não lidas: " + erro.getMessage(), erro);
+                    futuro.completeExceptionally(erro);
+                });
+        
+        return futuro;
+    }
+    
+    /**
      * Buscar solicitações de um proprietário
      */
     public static CompletableFuture<List<DocumentSnapshot>> buscarSolicitacoesProprietario(String idProprietario) {
@@ -2098,7 +2252,7 @@ public class GerenciadorFirebase {
                     dadosReserva.put("startDate", solicitacaoDoc.get("dataInicio"));
                     dadosReserva.put("endDate", solicitacaoDoc.get("dataFim"));
                     dadosReserva.put("totalPrice", solicitacaoDoc.getDouble("precoTotal"));
-                    dadosReserva.put("status", "CONFIRMED");
+                    dadosReserva.put("status", "CONFIRMADA");
                     dadosReserva.put("createdAt", Timestamp.now());
                     
                     // Garantir que firestore está inicializado
@@ -2373,7 +2527,7 @@ public class GerenciadorFirebase {
         
         firestore.collection("reservations")
                 .whereEqualTo("instrumentId", instrumentoId)
-                .whereEqualTo("status", "CONFIRMED")
+                .whereEqualTo("status", "CONFIRMADA")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     boolean disponivel = true;
@@ -2819,46 +2973,6 @@ public class GerenciadorFirebase {
         return atualizarNotaMediaInstrumento(instrumentoId);
     }
     
-    /**
-     * Atualiza a nota média de todos os instrumentos
-     * Método de debug para corrigir dados inconsistentes
-     */
-    public static CompletableFuture<Void> atualizarTodasAsNotasMedias() {
-        Log.d(TAG, "=== ATUALIZANDO TODAS AS NOTAS MÉDIAS ===");
-        
-        CompletableFuture<Void> futuro = new CompletableFuture<>();
-        
-        if (firestore == null) {
-            firestore = FirebaseFirestore.getInstance();
-        }
-        
-        firestore.collection("instruments")
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-                    
-                    for (DocumentSnapshot instrument : querySnapshot.getDocuments()) {
-                        futures.add(atualizarNotaMediaInstrumento(instrument.getId()));
-                    }
-                    
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                            .thenAccept(v -> {
-                                Log.d(TAG, "Todas as notas médias atualizadas");
-                                futuro.complete(null);
-                            })
-                            .exceptionally(throwable -> {
-                                Log.e(TAG, "Erro ao atualizar notas médias: " + throwable.getMessage(), throwable);
-                                futuro.completeExceptionally(throwable);
-                                return null;
-                            });
-                })
-                .addOnFailureListener(erro -> {
-                    Log.e(TAG, "Erro ao buscar instrumentos: " + erro.getMessage(), erro);
-                    futuro.completeExceptionally(erro);
-                });
-        
-        return futuro;
-    }
     
     /**
      * Marca uma conversa como excluída para um usuário específico

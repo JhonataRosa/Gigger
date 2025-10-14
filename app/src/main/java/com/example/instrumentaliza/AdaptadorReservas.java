@@ -125,14 +125,14 @@ public class AdaptadorReservas extends RecyclerView.Adapter<AdaptadorReservas.Vi
         
         // Configurar cor do status
         int corStatus;
-        switch (status != null ? status : "PENDING") {
-            case "CONFIRMED":
+        switch (status != null ? status : "PENDENTE") {
+            case "CONFIRMADA":
                 corStatus = holder.itemView.getContext().getResources().getColor(R.color.status_accepted);
                 break;
-            case "PENDING":
+            case "PENDENTE":
                 corStatus = holder.itemView.getContext().getResources().getColor(R.color.status_pending);
                 break;
-            case "CANCELLED":
+            case "CANCELADA":
                 corStatus = holder.itemView.getContext().getResources().getColor(R.color.status_rejected);
                 break;
             default:

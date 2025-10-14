@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -129,6 +130,14 @@ public class AdicionarInstrumentoActivity extends AppCompatActivity {
             }
 
             Log.d(TAG, "Usuário logado, ID: " + autenticacao.getCurrentUser().getUid());
+
+            // Configurar toolbar
+            androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
 
             // Inicializar views
             campoNome = findViewById(R.id.nameEditText);
@@ -288,6 +297,15 @@ public class AdicionarInstrumentoActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.error_generic) + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
             estaSalvando = false;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

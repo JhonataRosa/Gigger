@@ -21,10 +21,10 @@ import java.util.concurrent.Executors;
 
 public class AtividadeReserva extends AppCompatActivity {
     private static final String TAG = "AtividadeReserva";
-    private static final String STATUS_PENDENTE = "PENDING";
-    private static final String STATUS_CONFIRMADA = "CONFIRMED";
-    private static final String STATUS_CANCELADA = "CANCELLED";
-    private static final String STATUS_CONCLUIDA = "COMPLETED";
+    private static final String STATUS_PENDENTE = "PENDENTE";
+    private static final String STATUS_CONFIRMADA = "CONFIRMADA";
+    private static final String STATUS_CANCELADA = "CANCELADA";
+    private static final String STATUS_CONCLUIDA = "CONCLUIDA";
 
     private long instrumentId;
     private long userId;

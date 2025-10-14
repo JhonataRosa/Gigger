@@ -450,6 +450,9 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
 
             // Carregar instrumentos
             carregarInstrumentos();
+            
+            // Verificar solicitações não lidas na inicialização
+            verificarSolicitacoesNaoLidas();
         } catch (Exception e) {
             Toast.makeText(this, getString(R.string.error_generic) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
             finish();
@@ -760,10 +763,6 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
         // Configurar item de solicitações
         menuItemRequests = menu.findItem(R.id.action_requests);
         
-        // Adicionar botão de debug temporário
-        MenuItem debugItem = menu.add("Debug: Atualizar Notas");
-        debugItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        
         return true;
     }
 
@@ -776,29 +775,13 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             finish();
             return true;
         } else if (item.getItemId() == R.id.action_requests) {
+            // Marcar todas as solicitações como lidas quando o usuário acessa a tela
+            marcarTodasSolicitacoesComoLidas();
+            
             // Abrir tela de solicitações (todas as solicitações do usuário)
             Intent intent = new Intent(this, AtividadeListaSolicitacoes.class);
             // Não passar dados de instrumento específico - mostrar todas as solicitações
             startActivity(intent);
-            return true;
-        } else if (item.getTitle() != null && item.getTitle().toString().equals("Debug: Atualizar Notas")) {
-            // Botão de debug - atualizar todas as notas médias
-            Toast.makeText(this, "Atualizando todas as notas médias...", Toast.LENGTH_SHORT).show();
-            
-            GerenciadorFirebase.atualizarTodasAsNotasMedias()
-                    .thenAccept(v -> {
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Notas médias atualizadas com sucesso!", Toast.LENGTH_SHORT).show();
-                            // Recarregar a lista de instrumentos
-                            carregarInstrumentos();
-                        });
-                    })
-                    .exceptionally(erro -> {
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Erro ao atualizar notas: " + erro.getMessage(), Toast.LENGTH_LONG).show();
-                        });
-                        return null;
-                    });
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -853,6 +836,34 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             }
         }
     }
+    
+    
+    /**
+     * Marca todas as solicitações recebidas como lidas
+     * Chamado quando o usuário acessa a tela de solicitações
+     */
+    private void marcarTodasSolicitacoesComoLidas() {
+        FirebaseUser usuarioAtual = autenticacao.getCurrentUser();
+        if (usuarioAtual == null) {
+            Log.w(TAG, "Usuário não está logado");
+            return;
+        }
+        
+        String userId = usuarioAtual.getUid();
+        
+        GerenciadorFirebase.marcarTodasSolicitacoesComoLidas(userId)
+                .thenAccept(quantidadeMarcadas -> {
+                    // Atualizar o badge imediatamente após marcar como lidas
+                    runOnUiThread(() -> {
+                        verificarSolicitacoesNaoLidas();
+                    });
+                })
+                .exceptionally(erro -> {
+                    Log.e(TAG, "Erro ao marcar solicitações como lidas: " + erro.getMessage(), erro);
+                    return null;
+                });
+    }
+    
 
     /**
      * Atualiza o estado visual dos botões de ordenação por preço

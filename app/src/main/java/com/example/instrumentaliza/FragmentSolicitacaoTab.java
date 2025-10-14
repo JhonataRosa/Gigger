@@ -24,6 +24,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * FragmentSolicitacaoTab - Fragment para exibição de solicitações
+ * 
+ * Este fragment exibe uma lista de solicitações de reserva do usuário,
+ * diferenciando entre solicitações recebidas ("recebidas") e solicitações
+ * enviadas ("enviadas").
+ * 
+ * Funcionalidades:
+ * - Exibição de solicitações em RecyclerView
+ * - Diferenciação entre tipos de solicitação
+ * - Navegação para detalhes da solicitação
+ * - Estado vazio quando não há solicitações
+ * - Atualização automática dos dados
+ * 
+ * @author Jhonata
+ * @version 1.0
+ */
 public class FragmentSolicitacaoTab extends Fragment implements AdaptadorSolicitacoes.OnSolicitacaoClickListener {
     private static final String TAG = "FragmentSolicitacaoTab";
     

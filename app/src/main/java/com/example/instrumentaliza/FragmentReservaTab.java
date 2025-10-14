@@ -24,6 +24,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * FragmentReservaTab - Fragment para exibição de reservas
+ * 
+ * Este fragment exibe uma lista de reservas do usuário, diferenciando entre
+ * reservas de instrumentos próprios ("meus_instrumentos") e reservas de
+ * instrumentos alugados ("meus_interesses").
+ * 
+ * Funcionalidades:
+ * - Exibição de reservas em RecyclerView
+ * - Diferenciação entre tipos de reserva
+ * - Navegação para avaliação de instrumentos/usuários
+ * - Estado vazio quando não há reservas
+ * - Atualização automática dos dados
+ * 
+ * @author Jhonata
+ * @version 1.0
+ */
 public class FragmentReservaTab extends Fragment implements AdaptadorReservas.OnReservaClickListener {
     private static final String TAG = "FragmentReservaTab";
     

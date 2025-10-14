@@ -34,7 +34,7 @@ public class Usuario {
     // Dados pessoais do usuário
     private String nome;
     private String email;
-    private String senha; // Em uma implementação real, isso seria criptografado
+    private String senha; 
     private String telefone;
     private String uriImagemPerfil;
 
@@ -105,7 +105,7 @@ public class Usuario {
 
     /**
      * Obtém a senha do usuário
-     * @return Senha do usuário (em produção seria criptografada)
+     * @return Senha do usuário
      */
     public String getSenha() {
         return senha;

@@ -54,10 +54,10 @@ public class AtividadeMinhasReservas extends AppCompatActivity implements Adapta
     
     // Constantes
     private static final String TAG = "MinhasReservas";
-    private static final String STATUS_PENDENTE = "PENDING";
-    private static final String STATUS_CONFIRMADA = "CONFIRMED";
-    private static final String STATUS_CANCELADA = "CANCELLED";
-    private static final String STATUS_CONCLUIDA = "COMPLETED";
+    private static final String STATUS_PENDENTE = "PENDENTE";
+    private static final String STATUS_CONFIRMADA = "CONFIRMADA";
+    private static final String STATUS_CANCELADA = "CANCELADA";
+    private static final String STATUS_CONCLUIDA = "CONCLUIDA";
 
     // Componentes da interface
     private TabLayout tabLayout;

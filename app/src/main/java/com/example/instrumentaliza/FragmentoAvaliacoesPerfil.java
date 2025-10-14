@@ -11,6 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+/**
+ * FragmentoAvaliacoesPerfil - Fragmento de avaliações do perfil
+ * 
+ * Este fragmento exibe as avaliações recebidas pelo usuário como anunciante.
+ * Atualmente mostra uma mensagem informativa sobre implementação futura.
+ * 
+ * Funcionalidades planejadas:
+ * - Exibição de avaliações recebidas
+ * - Sistema de estrelas e comentários
+ * - Histórico de avaliações
+ * 
+ * @author Jhonata
+ * @version 1.0
+ */
 public class FragmentoAvaliacoesPerfil extends Fragment {
 
     @Override

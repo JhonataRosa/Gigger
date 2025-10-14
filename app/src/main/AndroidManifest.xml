@@ -55,6 +55,9 @@
             android:name=".AtividadeMeusInstrumentos"
             android:exported="false" />
         <activity 
+            android:name=".AtividadeEditarInstrumento"
+            android:exported="false" />
+        <activity 
             android:name=".AtividadeChat"
             android:exported="false" />
         <activity 

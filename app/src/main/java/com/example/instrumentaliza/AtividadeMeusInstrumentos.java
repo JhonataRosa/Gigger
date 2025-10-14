@@ -154,7 +154,9 @@ public class AtividadeMeusInstrumentos extends AppCompatActivity implements Adap
     @Override
     public void onEditClick(DocumentSnapshot instrument) {
         // Abrir tela de edição do instrumento
-        Toast.makeText(this, getString(R.string.info_no_data), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, AtividadeEditarInstrumento.class);
+        intent.putExtra("instrument_id", instrument.getId());
+        startActivityForResult(intent, 1); // Request code 1 para identificar retorno
     }
 
     @Override
@@ -195,6 +197,22 @@ public class AtividadeMeusInstrumentos extends AppCompatActivity implements Adap
                     );
                     return null;
                 });
+    }
+    
+    /**
+     * Manipula o retorno de atividades (como edição de instrumento)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == 1) { // Código da edição de instrumento
+            if (resultCode == RESULT_OK) {
+                // Recarregar a lista de instrumentos
+                Log.d(TAG, "Instrumento editado com sucesso, recarregando lista");
+                carregarMeusInstrumentos();
+            }
+        }
     }
 
 

@@ -5,6 +5,29 @@ import com.google.firebase.Timestamp;
 
 import java.util.Date;
 
+/**
+ * FirebaseReservation - Modelo de dados para reservas no Firebase Firestore
+ * 
+ * Esta classe representa uma reserva de instrumento no Firebase Firestore, contendo
+ * todas as informações necessárias para o sistema de aluguel de instrumentos.
+ * É usada para serialização/deserialização de dados do Firestore.
+ * 
+ * Funcionalidades:
+ * - Armazenamento de dados da reserva
+ * - Controle de status da reserva
+ * - Gerenciamento de datas de início e fim
+ * - Conversão de/para DocumentSnapshot do Firestore
+ * - Suporte a timestamps do Firebase
+ * 
+ * Características técnicas:
+ * - Modelo POJO para Firebase Firestore
+ * - Conversão automática de tipos do Firestore
+ * - Suporte a timestamps Firebase/Java
+ * - Controle de status de reserva
+ * 
+ * @author Jhonata
+ * @version 1.0
+ */
 public class FirebaseReservation {
     private String id;
     private String userId;
@@ -25,7 +48,7 @@ public class FirebaseReservation {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPrice = totalPrice;
-        this.status = "PENDING";
+        this.status = "PENDENTE";
         this.createdAt = new Date();
     }
 

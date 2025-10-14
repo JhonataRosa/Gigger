@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.instrumentaliza.models.FirebaseChat;
 import com.example.instrumentaliza.models.FirebaseInstrument;
+
+import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -128,6 +131,9 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
             holder.textoNomeInstrumento.setText(nomeExibicao);
         }
 
+        // Carregar foto do instrumento
+        carregarFotoInstrumento(chat.getInstrumentId(), holder.imagemInstrumento);
+
         // Formatar timestamp da última mensagem
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm", Locale.getDefault());
         if (chat.getLastMessageAt() != null) {
@@ -198,6 +204,54 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
     }
 
     /**
+     * Carrega a foto do instrumento do Firestore
+     * 
+     * Busca a foto do instrumento no Firestore e atualiza o ImageView.
+     * Em caso de erro ou instrumento não encontrado, mantém a imagem padrão.
+     * 
+     * @param instrumentId ID do instrumento a ser buscado
+     * @param imageView ImageView que será atualizado com a foto
+     */
+    private void carregarFotoInstrumento(String instrumentId, ImageView imageView) {
+        if (instrumentId == null || instrumentId.isEmpty()) {
+            Log.d(TAG, "ID do instrumento vazio, mantendo imagem padrão");
+            return;
+        }
+
+        Log.d(TAG, "Carregando foto do instrumento para ID: " + instrumentId);
+
+        firestore.collection("instruments").document(instrumentId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc != null && doc.exists()) {
+                        // Tentar diferentes campos de imagem
+                        String imageUrl = doc.getString("imageUrl");
+                        if (imageUrl == null || imageUrl.isEmpty()) {
+                            imageUrl = doc.getString("imageUri");
+                        }
+                        if (imageUrl == null || imageUrl.isEmpty()) {
+                            imageUrl = doc.getString("photoUrl");
+                        }
+                        
+                        Log.d(TAG, "URL da imagem encontrada: " + imageUrl);
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            // Carregar imagem com Glide
+                            Glide.with(imageView.getContext())
+                                    .load(imageUrl)
+                                    .centerCrop()
+                                    .into(imageView);
+                        } else {
+                            Log.d(TAG, "Nenhuma URL de imagem encontrada para o instrumento");
+                        }
+                    } else {
+                        Log.w(TAG, "Documento do instrumento não encontrado: " + instrumentId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Erro ao carregar foto do instrumento " + instrumentId + ": " + e.getMessage());
+                });
+    }
+
+    /**
      * Retorna o número total de conversas
      * 
      * @return Número de conversas na lista
@@ -227,6 +281,7 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
     static class ChatViewHolder extends RecyclerView.ViewHolder {
         
         // Componentes da interface da conversa
+        ImageView imagemInstrumento;
         TextView textoNomeInstrumento;
         TextView textoUltimaMensagem;
         TextView textoPapelBadge;
@@ -240,6 +295,7 @@ public class AdaptadorListaChat extends RecyclerView.Adapter<AdaptadorListaChat.
          */
         ChatViewHolder(View itemView) {
             super(itemView);
+            imagemInstrumento = itemView.findViewById(R.id.instrumentImageView);
             textoNomeInstrumento = itemView.findViewById(R.id.instrumentNameTextView);
             textoUltimaMensagem = itemView.findViewById(R.id.lastMessageTimeTextView);
             textoPapelBadge = itemView.findViewById(R.id.roleBadgeTextView);

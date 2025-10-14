@@ -259,4 +259,27 @@
     <string name="menu_logout">Sair</string>
     <string name="home_view_instruments">Ver Instrumentos</string>
     <string name="home_view_profile">Ver Perfil</string>
+    
+    <!-- Textos hardcoded dos layouts -->
+    <string name="instrument_name_placeholder">Nome do Instrumento</string>
+    <string name="your_ad">Seu anúncio</string>
+    <string name="all_instruments">Todos</string>
+    <string name="lower_price">MENOR PREÇO</string>
+    <string name="higher_price">MAIOR PREÇO</string>
+    <string name="instrument_photo">Foto do Instrumento</string>
+    <string name="change_photo_button">Alterar Foto</string>
+    <string name="my_conversations_title">Minhas Conversas</string>
+    <string name="my_ads_tab">Meus Anúncios</string>
+    <string name="my_interests_tab">Meus Interesses</string>
+    <string name="no_conversations_found">Nenhuma conversa encontrada</string>
+    <string name="no_conversations_message">Você ainda não tem conversas neste tipo.</string>
+    <string name="no_reservations_found">Nenhuma reserva encontrada</string>
+    <string name="no_reservations_message">Suas reservas aparecerão aqui quando você fizer um aluguel</string>
+    <string name="no_requests_found">Nenhuma solicitação encontrada</string>
+    <string name="no_requests_message">Suas solicitações aparecerão aqui quando você fizer uma solicitação ou receber uma</string>
+    <string name="my_requests_title">Minhas Solicitações</string>
+    <string name="received_tab">Recebidas</string>
+    <string name="sent_tab">Enviadas</string>
+    <string name="my_reservations_title">Minhas Reservas</string>
+    <string name="my_instruments_tab">Meus Instrumentos</string>
 </resources>

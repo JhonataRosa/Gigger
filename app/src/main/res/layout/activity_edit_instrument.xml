@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/orange_primary"
-            app:title="@string/add_instrument"
+            app:title="Editar Instrumento"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light" />
@@ -48,39 +48,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/instrument_name"
+                    android:text="Nome do Instrumento"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_black"
+                            android:textColor="@color/text_black"
                     android:layout_marginBottom="8dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/nameInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Digite o nome do instrumento">
+                    app:boxBackgroundColor="@color/beige_light"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/nameEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:background="@android:color/white"
-                        android:padding="12dp" />
+                        android:hint="Ex: Violão Giannini"
+                        android:textColor="@color/text_black"
+                        android:textSize="16sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card para descrição -->
+        <!-- Card para categoria -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/descriptionCard"
+            android:id="@+id/categoryCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -93,31 +97,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/instrument_description"
+                    android:text="Categoria"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_black"
+                            android:textColor="@color/text_black"
                     android:layout_marginBottom="8dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/descriptionInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Descreva o instrumento">
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    app:boxBackgroundColor="@color/beige_light"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/descriptionEditText"
+                    <AutoCompleteTextView
+                        android:id="@+id/categorySpinner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textMultiLine"
-                        android:minLines="3"
-                        android:background="@android:color/white"
-                        android:padding="12dp" />
+                        android:inputType="none"
+                        android:textColor="@color/text_black"
+                        android:textSize="16sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -133,45 +141,50 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             app:cardBackgroundColor="@color/beige_card"
-            app:layout_constraintTop_toBottomOf="@id/descriptionCard">
+            app:layout_constraintTop_toBottomOf="@id/categoryCard">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/instrument_price"
+                    android:text="Preço por Dia (R$)"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_black"
+                            android:textColor="@color/text_black"
                     android:layout_marginBottom="8dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/priceInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Digite o preço por diária">
+                    app:boxBackgroundColor="@color/beige_light"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/priceEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:background="@android:color/white"
-                        android:padding="12dp" />
+                        android:hint="Ex: 25.00"
+                        android:textColor="@color/text_black"
+                        android:textSize="16sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card para seleção de categoria -->
+        <!-- Card para descrição -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/categoryCard"
+            android:id="@+id/descriptionCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -184,107 +197,136 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/instrument_category"
+                    android:text="Descrição"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_black"
+                            android:textColor="@color/text_black"
                     android:layout_marginBottom="8dp" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/categoryInputLayout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Selecione uma categoria">
+                    app:boxBackgroundColor="@color/beige_light"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/categoryAutoComplete"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/descriptionEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:background="@android:color/white"
-                        android:padding="12dp" />
+                        android:inputType="textMultiLine"
+                        android:lines="3"
+                        android:maxLines="5"
+                        android:hint="Descreva o instrumento, estado, acessórios incluídos..."
+                        android:textColor="@color/text_black"
+                        android:textSize="16sp" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Card para seleção de foto -->
+        <!-- Card para foto -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/photoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             app:cardBackgroundColor="@color/beige_card"
-            app:layout_constraintTop_toBottomOf="@id/categoryCard">
+            app:layout_constraintTop_toBottomOf="@id/descriptionCard">
 
-             <LinearLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:orientation="vertical"
-                 android:padding="12dp"
-                 android:gravity="center">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="@string/instrument_photo"
-                     android:textSize="16sp"
-                     android:textStyle="bold"
-                     android:textColor="@color/text_black"
-                     android:layout_marginBottom="8dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foto do Instrumento"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                            android:textColor="@color/text_black"
+                    android:layout_marginBottom="8dp" />
 
-                 <ImageView
-                     android:id="@+id/instrumentImageView"
-                     android:layout_width="120dp"
-                     android:layout_height="120dp"
-                     android:background="@drawable/photo_placeholder_background"
-                     android:scaleType="centerCrop"
-                     android:src="@drawable/ic_add_photo"
-                     android:contentDescription="Preview da foto do instrumento" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                 <com.google.android.material.button.MaterialButton
-                     android:id="@+id/addPhotoButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_marginTop="8dp"
-                    android:text="@string/add_photo"
-                    android:textColor="@color/white"
-                    app:backgroundTint="@color/orange_primary"
-                    app:cornerRadius="20dp"
-                    app:icon="@drawable/ic_camera"
-                    app:iconTint="@color/white" />
+                    <ImageView
+                        android:id="@+id/instrumentImageView"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:background="@drawable/photo_placeholder_background"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_add_photo"
+                        android:contentDescription="Foto do instrumento" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/changePhotoButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Alterar Foto"
+                            android:textSize="14sp"
+                            android:textColor="@color/orange_primary"
+                            app:backgroundTint="@color/beige_light"
+                            app:cornerRadius="20dp"
+                            app:icon="@drawable/ic_camera"
+                            app:iconSize="16dp"
+                            app:iconPadding="4dp"
+                            app:iconTint="@color/orange_primary" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-         <com.google.android.material.button.MaterialButton
-             android:id="@+id/saveButton"
-             android:layout_width="match_parent"
-             android:layout_height="56dp"
-             android:layout_marginTop="20dp"
-             android:layout_marginBottom="12dp"
-            android:text="@string/save_instrument"
+        <!-- Botão Salvar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:text="Salvar Alterações"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            app:backgroundTint="@color/orange_primary"
-            app:cornerRadius="12dp"
+            android:backgroundTint="@color/orange_primary"
+            app:cornerRadius="28dp"
             app:icon="@drawable/ic_save"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
             app:iconTint="@color/white"
             app:layout_constraintTop_toBottomOf="@id/photoCard"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-     </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 

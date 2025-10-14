@@ -103,6 +103,14 @@ public class AtividadePerfil extends AppCompatActivity {
             imagemPerfil = findViewById(R.id.profileImageView);
             FloatingActionButton botaoEditarPerfil = findViewById(R.id.editProfileFab);
 
+            // Configurar Toolbar como ActionBar
+            androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+
             // Configurar sistema de abas (ViewPager2 + TabLayout)
             ViewPager2 viewPager = findViewById(R.id.profileViewPager);
             TabLayout tabLayout = findViewById(R.id.profileTabLayout);
