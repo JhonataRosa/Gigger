@@ -99,19 +99,24 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
     private boolean hasUnreadRequests = false;
 
     /**
-     * Normaliza uma string de categoria removendo acentos e convertendo para minúsculas
+     * Normaliza uma string de categoria removendo acentos e convertendo para primeira letra maiúscula
      * 
      * Utilizado para comparação de categorias independente de acentuação.
-     * Remove todos os caracteres diacríticos (acentos) e converte para minúsculas.
+     * Remove todos os caracteres diacríticos (acentos) e converte para primeira letra maiúscula.
+     * Esta função deve ser idêntica à usada em AdicionarInstrumentoActivity para manter consistência.
      * 
      * @param input String de entrada a ser normalizada
-     * @return String normalizada sem acentos e em minúsculas
+     * @return String normalizada sem acentos e com primeira letra maiúscula
      */
     private static String normalizarCategoria(String input) {
         if (input == null) return "";
         String normalized = Normalizer.normalize(input.trim(), Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        return normalized.toLowerCase(Locale.ROOT);
+        if (!normalized.isEmpty()) {
+            normalized = normalized.substring(0, 1).toUpperCase() + normalized.substring(1).toLowerCase();
+        }
+        Log.d("FiltroCategoria", "normalizarCategoria: '" + input + "' -> '" + normalized + "'");
+        return normalized;
     }
 
     /**
@@ -414,6 +419,7 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             });
             findViewById(R.id.catPercussao).setOnClickListener(v -> {
                 categoriaAtual = getString(R.string.category_percussao);
+                Log.d("FiltroCategoria", "Clique em Percussão - categoriaAtual: '" + categoriaAtual + "'");
                 carregarInstrumentos();
             });
             findViewById(R.id.catSopros).setOnClickListener(v -> {
@@ -422,6 +428,7 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             });
             findViewById(R.id.catAcessorios).setOnClickListener(v -> {
                 categoriaAtual = getString(R.string.category_acessorios);
+                Log.d("FiltroCategoria", "Clique em Acessórios - categoriaAtual: '" + categoriaAtual + "'");
                 carregarInstrumentos();
             });
             findViewById(R.id.catTodos).setOnClickListener(v -> {
@@ -546,8 +553,10 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             // Sem busca e sem filtro - carregar todos
             future = GerenciadorFirebase.obterTodosInstrumentos();
         } else if (consultaAtual.isEmpty()) {
-            // Apenas filtro de categoria
-            future = GerenciadorFirebase.obterInstrumentosPorCategoria(categoriaAtual);
+            // Apenas filtro de categoria - normalizar antes de enviar para Firebase
+            String categoriaNormalizada = normalizarCategoria(categoriaAtual);
+            Log.d("FiltroCategoria", "Enviando categoria normalizada para Firebase: '" + categoriaNormalizada + "'");
+            future = GerenciadorFirebase.obterInstrumentosPorCategoria(categoriaNormalizada);
         } else if (categoriaAtual.isEmpty()) {
             // Apenas busca por texto
             future = GerenciadorFirebase.buscarInstrumentos(consultaAtual);
@@ -561,10 +570,14 @@ public class AtividadeInstrumentos extends AppCompatActivity implements Adaptado
             
             // Se temos categoria e busca, filtrar localmente
             if (!consultaAtual.isEmpty() && !categoriaAtual.isEmpty()) {
+                String categoriaNormalizada = normalizarCategoria(categoriaAtual);
+                Log.d("FiltroCategoria", "Filtrando localmente - categoriaAtual: '" + categoriaAtual + "' -> normalizada: '" + categoriaNormalizada + "'");
                 instruments.removeIf(doc -> {
                     String category = (String) doc.get("category");
                     String normalizedCategory = normalizarCategoria(category);
-                    return !categoriaAtual.equals(normalizedCategory);
+                    boolean shouldRemove = !categoriaNormalizada.equals(normalizedCategory);
+                    Log.d("FiltroCategoria", "Doc: '" + category + "' -> normalizada: '" + normalizedCategory + "' -> remove: " + shouldRemove);
+                    return shouldRemove;
                 });
             }
 
